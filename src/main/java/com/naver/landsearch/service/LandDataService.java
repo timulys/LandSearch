@@ -51,6 +51,9 @@ public class LandDataService {
 				+ landDataDTO.getComplexDetail().getAddress() + "\t"
 				+ landDataDTO.getLandDataUrl());
 
+			System.out.println("매매 : " + landDataDTO.getComplexDetail().getDealCount() + "건\t"
+				+ "전세 : " + landDataDTO.getComplexDetail().getLeaseCount() + "건");
+
 			// 부동산 평형 및 타입
 			for (ComplexPyeongDetail complexPyeongDetail : landDataDTO.getComplexPyeongDetailList()) {
 				// 네이버 부동산 매매 실거래가 조회 URL
@@ -80,9 +83,10 @@ public class LandDataService {
 				LandRealDataDTO realLeaseDTO = new ObjectMapper().readValue(body.toString(), LandRealDataDTO.class);
 
 				// 호가 및 실거래가 전용 VO
-				LandRealDataVO vo = new LandRealDataVO();
-				vo.setSupplyArea(complexPyeongDetail.getSupplyArea());
-				vo.setPyeongName(complexPyeongDetail.getPyeongName());
+				LandRealDataVO vo = LandRealDataVO.builder()
+					.supplyArea(complexPyeongDetail.getSupplyArea())
+					.pyeongName(complexPyeongDetail.getPyeongName()).build();
+
 				// 호가 정보
 				if (complexPyeongDetail.getArticleStatistics() != null) {
 					vo.setSpacePrice(complexPyeongDetail.getArticleStatistics().getDealPricePerSpaceMin());
