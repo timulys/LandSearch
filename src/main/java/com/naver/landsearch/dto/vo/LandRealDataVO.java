@@ -1,9 +1,6 @@
 package com.naver.landsearch.dto.vo;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * PackageName 	: com.naver.landsearch.dto
@@ -20,6 +17,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class LandRealDataVO {
 	// 제곱미터 평형 면적
 	private String supplyArea;

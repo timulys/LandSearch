@@ -35,11 +35,20 @@ public class ComplexPyeongDetail {
 	private String exclusiveArea;
 	// 전용면적(평)
 	private String exclusivePyeong;
-	// 전용률
+	// 해당면적 세대수
 	private String householdCountByPyeong;
+	// 전용률
+	private String exclusiveRate;
 	// 입구 타입
 	private String entranceType;
+	// 방 개수
+	private String roomCnt;
+	// 화장실 개수
+	private String bathroomCnt;
 
 	// 평형별 가격 정보
 	private ArticleStatistics articleStatistics;
+
+	// 공시지가 정보
+	private LandPriceMaxByPtp landPriceMaxByPtp;
 }

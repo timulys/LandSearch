@@ -53,4 +53,6 @@ public class ComplexDetail {
 	private String parkingPossibleCount;
 	// 단지 주차 비율
 	private String parkingCountByHousehold;
+	// 단지 건설업체
+	private String constructionCompanyName;
 }
