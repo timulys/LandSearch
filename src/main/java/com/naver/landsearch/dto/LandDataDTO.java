@@ -21,7 +21,6 @@ import java.util.List;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LandDataDTO {
-	private String landDataUrl;
 	private ComplexDetail complexDetail;
 	private List<ComplexPyeongDetail> complexPyeongDetailList;
 }

@@ -2,7 +2,9 @@ package com.naver.landsearch.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -18,8 +20,9 @@ import java.util.List;
  * 2022-12-29			jhchoi				최초 생성
  */
 @Data
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RealPrice {
+public class RealPrice extends BaseDomain {
 	@JsonAlias("realPriceList")
 	private List<Price> realPriceList;
 

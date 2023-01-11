@@ -1,19 +1,20 @@
 package com.naver.landsearch.repository;
 
+import com.naver.landsearch.domain.ArticleStatistics;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * PackageName 	: com.naver.landsearch.repository
- * FileName 	: LandDataRepository
+ * FileName 	: ArticleStatisticsRepository
  * Author 		: jhchoi
- * Date 		: 2022-12-29
+ * Date 		: 2023-01-05
  * Description 	:
  * ======================================================
  * DATE				    AUTHOR				NOTICE
  * ======================================================
- * 2022-12-29			jhchoi				최초 생성
+ * 2023-01-05			jhchoi				최초 생성
  */
 @Repository
-public class LandDataRepository {
-	// TODO : 추후 JPA를 도입하여 데이터 저장 로직 및 조회 로직 구현 예정
+public interface ArticleStatisticsRepository extends JpaRepository<ArticleStatistics, Long> {
 }

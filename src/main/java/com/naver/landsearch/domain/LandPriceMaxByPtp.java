@@ -1,9 +1,12 @@
 package com.naver.landsearch.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.persistence.*;
 
 /**
  * PackageName 	: com.naver.landsearch.domain
@@ -16,11 +19,16 @@ import lombok.Setter;
  * ======================================================
  * 2023-01-04			jhchoi				최초 생성
  */
+@Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LandPriceMaxByPtp {
+@Table
+public class LandPriceMaxByPtp extends BaseDomain {
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "ptp_id")
+	private Long id;
 	// 공시지가 최저가
 	private String minPrice;
 	// 공시지가 최고가

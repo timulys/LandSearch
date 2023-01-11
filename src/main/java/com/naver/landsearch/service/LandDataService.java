@@ -1,10 +1,16 @@
 package com.naver.landsearch.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.naver.landsearch.domain.ComplexDetail;
 import com.naver.landsearch.domain.ComplexPyeongDetail;
 import com.naver.landsearch.dto.LandDataDTO;
 import com.naver.landsearch.dto.LandRealDataDTO;
-import com.naver.landsearch.dto.vo.LandRealDataVO;
+import com.naver.landsearch.dto.vo.LandViewDataVO;
+import com.naver.landsearch.repository.ArticleStatisticsRepository;
+import com.naver.landsearch.repository.ComplexDetailRepository;
+import com.naver.landsearch.repository.ComplexPyeongDetailRepository;
+import com.naver.landsearch.repository.LandPriceMaxByPtpRepository;
+import lombok.RequiredArgsConstructor;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,6 +18,7 @@ import org.jsoup.nodes.Node;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * PackageName 	: com.naver.landsearch.service
@@ -25,16 +32,29 @@ import java.io.IOException;
  * 2022-12-29			jhchoi				최초 생성
  */
 @Service
+@RequiredArgsConstructor
 public class LandDataService {
-	// 인증코드 상수 선언
+	// 인증코드
 	public static final String AUTH = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlJFQUxFU1RBVEUiLCJpYXQiOjE2NzIyMTAwODYsImV4cCI6MTY3MjIyMDg4Nn0.Rjio48UHtENluaAJBF8LhYDD-Ud6YN3FPOaqdafwwAM";
+	// 네이버 부동산 URL
+	public static final String LAND = "https://new.land.naver.com/complexes/";
+	// 네이버 부동산 API URL
+	public static final String LAND_API = "https://new.land.naver.com/api/complexes/";
 
-	public void getLandData(String complexCode) {
+	// Dependency injection repositories
+	private final ComplexDetailRepository complexDetailRepository;
+	private final ComplexPyeongDetailRepository complexPyeongDetailRepository;
+	private final ArticleStatisticsRepository articleStatisticsRepository;
+	private final LandPriceMaxByPtpRepository landPriceMaxByPtpRepository;
+
+	// Service methods
+	public LandViewDataVO saveLandData(String complexCode) {
+		LandViewDataVO landViewDataVO = null;
 		try {
 			// 네이버 부동산 조회 URL
-			String url = "https://new.land.naver.com/complexes/" + complexCode;
+			String url = LAND + complexCode;
 			// 네이버 부동산 데이터 조회 URL
-			String complexUrl = "https://new.land.naver.com/api/complexes/" + complexCode + "?sameAddressGroup=true";
+			String complexUrl = LAND_API + complexCode + "?sameAddressGroup=true";
 			Connection con = Jsoup.connect(complexUrl)
 				.header("Authorization", AUTH)
 				.method(Connection.Method.GET)
@@ -43,21 +63,26 @@ public class LandDataService {
 			Node body = doc.selectFirst("body").childNode(0);
 			// 네이버 부동산 기본 정보 및 Deal 가격 DTO 생성
 			LandDataDTO landDataDTO = new ObjectMapper().readValue(body.toString(), LandDataDTO.class);
-			landDataDTO.setLandDataUrl(url); // 네이버 부동산 조회 URL
+			landDataDTO.getComplexDetail().setLandDataUrl(url); // 네이버 부동산 조회 URL
 
-			// 부동산 기본 정보
-			System.out.println(landDataDTO.getComplexDetail().getComplexNo() + "\t"
-				+ landDataDTO.getComplexDetail().getComplexName() + "\t"
-				+ landDataDTO.getComplexDetail().getAddress() + "\t"
-				+ landDataDTO.getLandDataUrl());
-
-			System.out.println("매매 : " + landDataDTO.getComplexDetail().getDealCount() + "건\t"
-				+ "전세 : " + landDataDTO.getComplexDetail().getLeaseCount() + "건");
+			// ComplexDetail insert
+			complexDetailRepository.save(landDataDTO.getComplexDetail());
 
 			// 부동산 평형 및 타입
 			for (ComplexPyeongDetail complexPyeongDetail : landDataDTO.getComplexPyeongDetailList()) {
+				// ComplexDetail과의 연관관계 설정
+				complexPyeongDetail.setComplexDetail(landDataDTO.getComplexDetail());
+
+				// Land detail data insert
+				// 호가 정보
+				articleStatisticsRepository.save(complexPyeongDetail.getArticleStatistics());
+				// 공시지가 정보
+				landPriceMaxByPtpRepository.save(complexPyeongDetail.getLandPriceMaxByPtp());
+				// 평형 정보
+				complexPyeongDetailRepository.save(complexPyeongDetail);
+
 				// 네이버 부동산 매매 실거래가 조회 URL
-				String realDealUrl = "https://new.land.naver.com/api/complexes/" + complexCode + "/prices/real?complexNo="
+				String realDealUrl = LAND_API + complexCode + "/prices/real?complexNo="
 					+ complexCode + "&tradeType=A1&year=5&areaNo=" + complexPyeongDetail.getPyeongNo() + "&type=table";
 
 				con = Jsoup.connect(realDealUrl)
@@ -70,7 +95,7 @@ public class LandDataService {
 				LandRealDataDTO realDealDTO = new ObjectMapper().readValue(body.toString(), LandRealDataDTO.class);
 
 				// 네이버 부동산 전세 실거래가 조회 URL
-				String realLeaseUrl = "https://new.land.naver.com/api/complexes/" + complexCode + "/prices/real?complexNo="
+				String realLeaseUrl = LAND_API + complexCode + "/prices/real?complexNo="
 					+ complexCode + "&tradeType=B1&year=5&areaNo=" + complexPyeongDetail.getPyeongNo() + "&type=table";
 
 				con = Jsoup.connect(realLeaseUrl)
@@ -83,49 +108,54 @@ public class LandDataService {
 				LandRealDataDTO realLeaseDTO = new ObjectMapper().readValue(body.toString(), LandRealDataDTO.class);
 
 				// 호가 및 실거래가 전용 VO
-				LandRealDataVO vo = LandRealDataVO.builder()
-					.supplyArea(complexPyeongDetail.getSupplyArea())
-					.pyeongName(complexPyeongDetail.getPyeongName()).build();
-
+				landViewDataVO = new LandViewDataVO();
+				landViewDataVO.setSupplyArea(complexPyeongDetail.getSupplyArea());
+				landViewDataVO.setPyeongName(complexPyeongDetail.getPyeongName());
 				// 호가 정보
 				if (complexPyeongDetail.getArticleStatistics() != null) {
-					vo.setSpacePrice(complexPyeongDetail.getArticleStatistics().getDealPricePerSpaceMin());
-					vo.setDealPriceMin(complexPyeongDetail.getArticleStatistics().getDealPriceMin());
-					vo.setLeasePriceMin(complexPyeongDetail.getArticleStatistics().getLeasePriceMin());
+					landViewDataVO.setSpacePrice(complexPyeongDetail.getArticleStatistics().getDealPricePerSpaceMin());
+					landViewDataVO.setDealPriceMin(complexPyeongDetail.getArticleStatistics().getDealPriceMin());
+					landViewDataVO.setLeasePriceMin(complexPyeongDetail.getArticleStatistics().getLeasePriceMin());
 				} else {
-					vo.setSpacePrice("0");
-					vo.setDealPriceMin("0");
-					vo.setLeasePriceMin("0");
+					landViewDataVO.setSpacePrice("0");
+					landViewDataVO.setDealPriceMin("0");
+					landViewDataVO.setLeasePriceMin("0");
 				}
 				// 매매 실거래가 정보
 				if (realDealDTO.getRealPriceOnMonthList().size() > 0) {
-					vo.setRealDealPrice(realDealDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getFormattedPrice());
-					vo.setRealDealYear(realDealDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getTradeYear());
-					vo.setRealDealMonth(realDealDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getTradeMonth());
-					vo.setRealDealFloor(realDealDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getFloor());
+					landViewDataVO.setRealDealPrice(realDealDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getFormattedPrice());
+					landViewDataVO.setRealDealYear(realDealDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getTradeYear());
+					landViewDataVO.setRealDealMonth(realDealDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getTradeMonth());
+					landViewDataVO.setRealDealFloor(realDealDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getFloor());
 				} else {
-					vo.setRealDealPrice("0");
-					vo.setRealDealYear("0");
-					vo.setRealDealMonth("0");
-					vo.setRealDealFloor("0");
+					landViewDataVO.setRealDealPrice("0");
+					landViewDataVO.setRealDealYear("0");
+					landViewDataVO.setRealDealMonth("0");
+					landViewDataVO.setRealDealFloor("0");
 				}
 				// 전세 실거래가 정보
 				if (realLeaseDTO.getRealPriceOnMonthList().size() > 0) {
-					vo.setRealLeasePrice(realLeaseDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getFormattedPrice());
-					vo.setRealLeaseYear(realLeaseDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getTradeYear());
-					vo.setRealLeaseMonth(realLeaseDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getTradeMonth());
-					vo.setRealLeaseFloor(realLeaseDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getFloor());
+					landViewDataVO.setRealLeasePrice(realLeaseDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getFormattedPrice());
+					landViewDataVO.setRealLeaseYear(realLeaseDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getTradeYear());
+					landViewDataVO.setRealLeaseMonth(realLeaseDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getTradeMonth());
+					landViewDataVO.setRealLeaseFloor(realLeaseDTO.getRealPriceOnMonthList().get(0).getRealPriceList().get(0).getFloor());
 				} else {
-					vo.setRealLeasePrice("0");
-					vo.setRealLeaseYear("0");
-					vo.setRealLeaseMonth("0");
-					vo.setRealLeaseFloor("0");
+					landViewDataVO.setRealLeasePrice("0");
+					landViewDataVO.setRealLeaseYear("0");
+					landViewDataVO.setRealLeaseMonth("0");
+					landViewDataVO.setRealLeaseFloor("0");
 				}
-				vo.printData();
+				landViewDataVO.printData();
 			}
 			System.out.println();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return landViewDataVO;
+	}
+
+	public LandViewDataVO getLandData(String complexCode) {
+		Optional<ComplexDetail> complexDetail = complexDetailRepository.findById(complexCode);
+		return null;
 	}
 }

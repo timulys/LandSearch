@@ -18,7 +18,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LandRealDataVO {
+public class LandViewDataVO {
 	// 제곱미터 평형 면적
 	private String supplyArea;
 	// 평 타입 이름

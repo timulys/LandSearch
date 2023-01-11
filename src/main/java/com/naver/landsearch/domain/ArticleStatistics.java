@@ -1,9 +1,12 @@
 package com.naver.landsearch.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.persistence.*;
 
 /**
  * PackageName 	: com.naver.landsearch.domain
@@ -16,11 +19,16 @@ import lombok.Setter;
  * ======================================================
  * 2022-12-29			jhchoi				최초 생성
  */
+@Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ArticleStatistics {
+@Table
+public class ArticleStatistics extends BaseDomain {
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "article_id")
+	private Long id;
 	// 해당 타입 매매매물 수
 	private String dealCount;
 	// 해당 타입 전세매물 수
