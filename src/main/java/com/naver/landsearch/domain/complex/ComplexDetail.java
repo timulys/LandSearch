@@ -1,10 +1,9 @@
-package com.naver.landsearch.domain;
+package com.naver.landsearch.domain.complex;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.naver.landsearch.domain.BaseDomain;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -23,10 +22,11 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Table
-public class ComplexDetail {
+public class ComplexDetail extends BaseDomain {
 	@Id
 	@Column
 	private String complexNo;                    // 단지 코드
@@ -51,6 +51,8 @@ public class ComplexDetail {
 	@Column
 	private String totalDongCount;               // 단지 동 수
 	@Column
+	private String pyoengNames;					 // 평형 타입 정보
+	@Column
 	private String dealCount;                    // 단지 매매매물 숫자
 	@Column
 	private String leaseCount;                   // 단지 전세매물 숫자
@@ -67,7 +69,27 @@ public class ComplexDetail {
 	@Column
 	private String constructionCompanyName;      // 단지 건설업체
 
+	// 추후 검색을 위해 주소를 분리
+	@Column
+	private String address_1; // 도, 시
+	@Column
+	private String address_2; // 시, 구
+	@Column
+	private String address_3; // 구, 동, 읍, 면
+	@Column
+	private String address_4; // 동, 읍, 면
+	
 	// 연관관계 매핑
+	@JsonManagedReference
 	@OneToMany(mappedBy = "complexDetail")
 	private List<ComplexPyeongDetail> complexPyeongDetailList;
+
+	public void splitAddress() {
+		String[] split = this.address.split(" ");
+		this.address_1 = split[0];
+		this.address_2 = split[1];
+		this.address_3 = split[2];
+		if (split.length >= 4)
+			this.address_4 = split[3];
+	}
 }

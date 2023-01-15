@@ -1,6 +1,7 @@
-package com.naver.landsearch.domain;
+package com.naver.landsearch.domain.price;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.naver.landsearch.domain.BaseDomain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Table
-public class LandPriceMaxByPtp extends BaseDomain {
+public class LandPriceMaxByPtp {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ptp_id")
 	private Long id;

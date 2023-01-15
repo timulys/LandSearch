@@ -1,4 +1,4 @@
-package com.naver.landsearch.dto.vo;
+package com.naver.landsearch.domain.vo;
 
 import lombok.*;
 
@@ -51,14 +51,4 @@ public class LandViewDataVO {
 	private String realLeaseMonth;
 	// 실거래가 최근 전세 층
 	private String realLeaseFloor;
-
-	public void printData() {
-		System.out.println(
-			this.supplyArea+"\t"+this.pyeongName+"\t"+this.spacePrice+"\t"
-			+this.realDealPrice+"("+this.realDealYear+"."+this.realDealMonth+", "+this.realDealFloor+"층)\t"
-			+this.dealPriceMin+"\t"
-			+this.realLeasePrice+"("+this.realLeaseYear+"."+this.realLeaseMonth+", "+this.realLeaseFloor+"층)\t"
-			+this.leasePriceMin
-		);
-	}
 }

@@ -1,13 +1,24 @@
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Land Search Page</title>
 </head>
 <body>
-  <div>
-    <label>아파트 코드 입력 : </label>
-    <input type="text" />
-  </div>
+<script type="text/javascript" src="/js/home.js"></script>
+<!--<script src="webjars/jquery/3.6.0/jquery.js"></script>-->
+    <div>
+        <label>아파트 코드 입력 : </label>
+        <input id="complexCode" type="text" />
+    </div>
+    <input value="등륵하기" type="button" onclick="dataSend()"/>
+    &nbsp&nbsp
+    <input value="조회하기" type="button" onclick="dataSelect()"/>
+    <HR/>
+    <div id="dataContent">
+        <p id="result"></p>
+        <a id="link" target="_blank">[바로보기]</a>
+    </div>
 </body>
 </html>

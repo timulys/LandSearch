@@ -1,6 +1,11 @@
-package com.naver.landsearch.domain;
+package com.naver.landsearch.domain.complex;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.naver.landsearch.domain.price.ArticleStatistics;
+import com.naver.landsearch.domain.BaseDomain;
+import com.naver.landsearch.domain.price.ComplexRealPrice;
+import com.naver.landsearch.domain.price.LandPriceMaxByPtp;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +30,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Table
-public class ComplexPyeongDetail extends BaseDomain {
+public class ComplexPyeongDetail {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "pyeong_id")
 	private Long id;
@@ -56,14 +61,24 @@ public class ComplexPyeongDetail extends BaseDomain {
 
 	// 연관관계 설정
 	// 평형별 가격 정보 매핑
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "article_id")
 	private ArticleStatistics articleStatistics;
 	// 공시지가 정보 매핑
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ptp_id")
 	private LandPriceMaxByPtp landPriceMaxByPtp;
+	// 매매 실거래가 정보 매핑
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "deal_price_id")
+	private ComplexRealPrice realDealPrice;
+	// 전세 실거래가 정보 매핑
+	@OneToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name = "lease_price_id")
+	private ComplexRealPrice realLeasePrice;
+
 	// 연관관계 매핑
+	@JsonBackReference
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "complex_no")
 	private ComplexDetail complexDetail;

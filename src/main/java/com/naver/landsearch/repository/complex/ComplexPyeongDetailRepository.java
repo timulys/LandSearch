@@ -1,11 +1,12 @@
-package com.naver.landsearch.repository;
+package com.naver.landsearch.repository.complex;
 
-import com.naver.landsearch.domain.LandPriceMaxByPtp;
+import com.naver.landsearch.domain.complex.ComplexPyeongDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * PackageName 	: com.naver.landsearch.repository
- * FileName 	: LandPriceMaxByPtpRepository
+ * FileName 	: ComplexPyeongDetailRepository
  * Author 		: jhchoi
  * Date 		: 2023-01-05
  * Description 	:
@@ -14,5 +15,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * ======================================================
  * 2023-01-05			jhchoi				최초 생성
  */
-public interface LandPriceMaxByPtpRepository extends JpaRepository<LandPriceMaxByPtp, Long> {
+@Repository
+public interface ComplexPyeongDetailRepository extends JpaRepository<ComplexPyeongDetail, String> {
 }

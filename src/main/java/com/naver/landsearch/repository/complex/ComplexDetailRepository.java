@@ -1,20 +1,20 @@
-package com.naver.landsearch.repository;
+package com.naver.landsearch.repository.complex;
 
-import com.naver.landsearch.domain.ArticleStatistics;
+import com.naver.landsearch.domain.complex.ComplexDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * PackageName 	: com.naver.landsearch.repository
- * FileName 	: ArticleStatisticsRepository
+ * FileName 	: LandDataRepository
  * Author 		: jhchoi
- * Date 		: 2023-01-05
+ * Date 		: 2022-12-29
  * Description 	:
  * ======================================================
  * DATE				    AUTHOR				NOTICE
  * ======================================================
- * 2023-01-05			jhchoi				최초 생성
+ * 2022-12-29			jhchoi				최초 생성
  */
 @Repository
-public interface ArticleStatisticsRepository extends JpaRepository<ArticleStatistics, Long> {
+public interface ComplexDetailRepository extends JpaRepository<ComplexDetail, String> {
 }

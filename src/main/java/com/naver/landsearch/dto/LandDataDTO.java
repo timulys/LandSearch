@@ -1,8 +1,8 @@
 package com.naver.landsearch.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.naver.landsearch.domain.ComplexDetail;
-import com.naver.landsearch.domain.ComplexPyeongDetail;
+import com.naver.landsearch.domain.complex.ComplexDetail;
+import com.naver.landsearch.domain.complex.ComplexPyeongDetail;
 import lombok.Data;
 
 import java.util.List;
