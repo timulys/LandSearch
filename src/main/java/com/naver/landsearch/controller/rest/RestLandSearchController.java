@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * PackageName 	: com.naver.landsearch.controller
  * FileName 	: testController
@@ -34,14 +38,16 @@ public class RestLandSearchController {
 	public final LandDataService landDataService;
 
 	@GetMapping("/landByCode")
-	public ResponseEntity saveComplexInfoByCode(@RequestParam("complexCode") String complexCode) {
-		// TODO : DB에 complexCode로 조회를 하여 존재 여부 먼저 확인
-		// TODO : landDataService.getLandData(complexCode)
-		// TODO : 존재한다면 update를 해야하는가 select를 해야 하는가?
-		// TODO : 이후 DB에 해당 단지 데이터가 없으면 saveLandData 호출
-		LandViewDataVO landViewDataVO = landDataService.saveLandData(complexCode);
-		if (landViewDataVO != null) {
-			return new ResponseEntity<>(landViewDataVO, HttpStatus.CREATED);
+	public ResponseEntity<Map<String, Object>> saveComplexInfoByCode(@RequestParam("complexCode") String complexCode) {
+		// ComplexCode를 통한 신규 네이버 부동산 데이터 Insert/Update
+		landDataService.saveLandData(complexCode);
+		// 등록된 전체 Complex 목록 조회
+		List<LandViewDataVO> landViewDataVOList = landDataService.selectAllLandDataVO();
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", landViewDataVOList);
+		if (landViewDataVOList != null) {
+			return ResponseEntity.ok().body(result);
 		}
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}

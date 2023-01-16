@@ -23,6 +23,9 @@ import org.jsoup.nodes.Node;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -56,8 +59,7 @@ public class LandDataService {
 	private final ComplexRealPriceRepository complexRealPriceRepository;
 
 	// Service methods
-	public LandViewDataVO saveLandData(String complexCode) {
-		LandViewDataVO landViewDataVO = null;
+	public void saveLandData(String complexCode) {
 		try { // TODO : 각 서비스 모듈 간 메소드 분리 작업 진행
 			// 네이버 부동산 조회 URL
 			String url = LAND + complexCode;
@@ -105,19 +107,26 @@ public class LandDataService {
 
 				// 평형 정보
 				complexPyeongDetailRepository.save(complexPyeongDetail);
-
-				// 호가 및 실거래가 전용 VO
-				landViewDataVO = new LandViewDataVO();
-				landViewDataVO.setComplexName(landDataDTO.getComplexDetail().getComplexName());
-				landViewDataVO.setLandDataUrl(url);
-				landViewDataVO.setSupplyArea(complexPyeongDetail.getSupplyArea());
-				landViewDataVO.setPyeongName(complexPyeongDetail.getPyeongName());
-
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return landViewDataVO;
+	}
+
+	public List<LandViewDataVO> selectAllLandDataVO() {
+		List<LandViewDataVO> resultList = new ArrayList<>();
+		// UI 표현 가능하도록 변경
+		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll();
+		complexDetailList.forEach(complex -> {
+			resultList.add(LandViewDataVO.builder()
+				.complexNo(complex.getComplexNo())
+				.complexName(complex.getComplexName())
+				.landDataUrl(complex.getLandDataUrl())
+				.updateAt(complex.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+				.build());
+		});
+
+		return resultList;
 	}
 
 	public ComplexDetail getLandData(String complexCode) {

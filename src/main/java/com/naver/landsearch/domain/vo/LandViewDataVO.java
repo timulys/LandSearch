@@ -19,6 +19,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LandViewDataVO {
+	// 단지 코드
+	private String complexNo;
 	// 단지 명
 	private String complexName;
 	// 네이버 부동산 Direct URL
@@ -51,4 +53,7 @@ public class LandViewDataVO {
 	private String realLeaseMonth;
 	// 실거래가 최근 전세 층
 	private String realLeaseFloor;
+
+	// 업데이트 일시
+	private String updateAt;
 }
