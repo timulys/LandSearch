@@ -4,6 +4,8 @@ import com.naver.landsearch.domain.complex.ComplexDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * PackageName 	: com.naver.landsearch.repository
  * FileName 	: LandDataRepository

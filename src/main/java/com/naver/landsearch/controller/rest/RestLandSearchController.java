@@ -52,6 +52,17 @@ public class RestLandSearchController {
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
 
+	@GetMapping("/allData")
+	public ResponseEntity<Map<String, Object>> allSelectComplexInfo() {
+		List<LandViewDataVO> landViewDataVOList = landDataService.selectAllLandDataVO();
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", landViewDataVOList);
+		if (landViewDataVOList != null) {
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity(HttpStatus.NO_CONTENT);
+	}
+
 	@GetMapping("/getByCode")
 	public ResponseEntity getComplexInfoByCode(@RequestParam("complexCode") String complexCode, Model model) {
 		try {
