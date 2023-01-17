@@ -6,10 +6,11 @@ import com.naver.landsearch.domain.complex.ComplexPyeongDetail;
 import com.naver.landsearch.domain.price.ArticleStatistics;
 import com.naver.landsearch.domain.price.ComplexRealPrice;
 import com.naver.landsearch.domain.price.LandPriceMaxByPtp;
-import com.naver.landsearch.domain.vo.realprice.Price;
-import com.naver.landsearch.domain.vo.realprice.RealPrice;
+import com.naver.landsearch.domain.realprice.Price;
+import com.naver.landsearch.domain.realprice.RealPrice;
+import com.naver.landsearch.domain.vo.ComplexPyeongVO;
 import com.naver.landsearch.dto.LandDataDTO;
-import com.naver.landsearch.domain.vo.LandViewDataVO;
+import com.naver.landsearch.domain.vo.ComplexVO;
 import com.naver.landsearch.repository.complex.ComplexDetailRepository;
 import com.naver.landsearch.repository.complex.ComplexPyeongDetailRepository;
 import com.naver.landsearch.repository.price.ArticleStatisticsRepository;
@@ -20,13 +21,13 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * PackageName 	: com.naver.landsearch.service
@@ -113,16 +114,42 @@ public class LandDataService {
 		}
 	}
 
-	public List<LandViewDataVO> selectAllLandDataVO() {
-		List<LandViewDataVO> resultList = new ArrayList<>();
+	public List<ComplexVO> selectAllLandDataVO() {
+		List<ComplexVO> resultList = new ArrayList<>();
 		// UI 표현 가능하도록 변경
 		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll();
 		complexDetailList.forEach(complex -> {
-			resultList.add(LandViewDataVO.builder()
+			int pyeongTypes = complex.getPyoengNames().split(",").length;
+			List<ComplexPyeongVO> splitPyeongList = new ArrayList<>();
+			List<ComplexPyeongVO> pyeongList = new ArrayList<>();
+			if (complex.getComplexPyeongDetailList() != null) {
+				complex.getComplexPyeongDetailList().forEach(pyeong -> {
+					pyeongList.add(ComplexPyeongVO.builder()
+						.pyeongName(pyeong.getPyeongName())
+						.pyeongName2(pyeong.getPyeongName2())
+						.dealPriceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getDealPriceMin() != null
+							? pyeong.getArticleStatistics().getDealPriceMin() : "0")
+						.dealPricePerSpaceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getDealPricePerSpaceMin() != null ?
+							pyeong.getArticleStatistics().getDealPricePerSpaceMin() : "0")
+						.leasePriceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePriceMin() != null ?
+							pyeong.getArticleStatistics().getLeasePriceMin() : "0")
+						.leasePricePerSpaceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePricePerSpaceMin() != null ?
+							pyeong.getArticleStatistics().getLeasePricePerSpaceMin() : "0")
+						.build());
+				});
+			}
+
+			if (pyeongList.size() > pyeongTypes)
+				splitPyeongList = pyeongList.subList(pyeongList.size() - pyeongTypes, pyeongList.size());
+			else
+				splitPyeongList = pyeongList;
+
+			resultList.add(ComplexVO.builder()
 				.complexNo(complex.getComplexNo())
 				.complexName(complex.getComplexName())
 				.landDataUrl(complex.getLandDataUrl())
 				.updateAt(complex.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+				.complexPyeongVOList(splitPyeongList)
 				.build());
 		});
 

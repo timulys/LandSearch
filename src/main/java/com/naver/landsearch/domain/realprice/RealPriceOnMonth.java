@@ -1,4 +1,4 @@
-package com.naver.landsearch.domain.vo.realprice;
+package com.naver.landsearch.domain.realprice;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;

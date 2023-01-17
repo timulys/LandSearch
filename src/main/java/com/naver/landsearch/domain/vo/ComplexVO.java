@@ -1,6 +1,9 @@
 package com.naver.landsearch.domain.vo;
 
+import com.naver.landsearch.domain.complex.ComplexPyeongDetail;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * PackageName 	: com.naver.landsearch.dto
@@ -18,7 +21,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LandViewDataVO {
+public class ComplexVO {
 	// 단지 코드
 	private String complexNo;
 	// 단지 명
@@ -56,4 +59,7 @@ public class LandViewDataVO {
 
 	// 업데이트 일시
 	private String updateAt;
+
+	// 단지 평형별 기본 데이터 목록
+	private List<ComplexPyeongVO> complexPyeongVOList;
 }

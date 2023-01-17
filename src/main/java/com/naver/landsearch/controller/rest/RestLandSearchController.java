@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.naver.landsearch.domain.complex.ComplexDetail;
-import com.naver.landsearch.domain.vo.LandViewDataVO;
+import com.naver.landsearch.domain.vo.ComplexVO;
 import com.naver.landsearch.service.LandDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,11 +42,11 @@ public class RestLandSearchController {
 		// ComplexCode를 통한 신규 네이버 부동산 데이터 Insert/Update
 		landDataService.saveLandData(complexCode);
 		// 등록된 전체 Complex 목록 조회
-		List<LandViewDataVO> landViewDataVOList = landDataService.selectAllLandDataVO();
+		List<ComplexVO> complexVOList = landDataService.selectAllLandDataVO();
 
 		Map<String, Object> result = new HashMap<>();
-		result.put("complexs", landViewDataVOList);
-		if (landViewDataVOList != null) {
+		result.put("complexs", complexVOList);
+		if (complexVOList != null) {
 			return ResponseEntity.ok().body(result);
 		}
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -54,10 +54,12 @@ public class RestLandSearchController {
 
 	@GetMapping("/allData")
 	public ResponseEntity<Map<String, Object>> allSelectComplexInfo() {
-		List<LandViewDataVO> landViewDataVOList = landDataService.selectAllLandDataVO();
+		// 등록된 전체 Complex 목록 조회
+		List<ComplexVO> complexVOList = landDataService.selectAllLandDataVO();
+		
 		Map<String, Object> result = new HashMap<>();
-		result.put("complexs", landViewDataVOList);
-		if (landViewDataVOList != null) {
+		result.put("complexs", complexVOList);
+		if (complexVOList != null) {
 			return ResponseEntity.ok().body(result);
 		}
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -66,9 +68,9 @@ public class RestLandSearchController {
 	@GetMapping("/getByCode")
 	public ResponseEntity getComplexInfoByCode(@RequestParam("complexCode") String complexCode, Model model) {
 		try {
-			ComplexDetail landData = landDataService.getLandData(complexCode);
+			ComplexDetail complexDetail = landDataService.getLandData(complexCode);
 			ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
-			return new ResponseEntity<>(mapper.writeValueAsString(landData), HttpStatus.OK);
+			return new ResponseEntity<>(mapper.writeValueAsString(complexDetail), HttpStatus.OK);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}

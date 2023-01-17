@@ -11,14 +11,7 @@ function dataSelectAll() {
         type: "GET",
     }).done((data) => {
         $("#dataContent").empty();
-        var template = "";
-        data.complexs.forEach(function(item) {
-            template += "<p><span>" + "[" +  item.complexNo + "]" + item.complexName + "(" + item.updateAt + ")</span>";
-            template += "<a href='" + item.landDataUrl + "'>[바로보기]</a>";
-            template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='조회하기'/>";
-            template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='업데이트'/></p>";
-        })
-        $("#dataContent").append(template);
+        $("#dataContent").append(renderTemplate(data));
     })
 }
 
@@ -34,15 +27,26 @@ function dataSendByCode(code) {
         type: "GET",
     }).done((data) => {
         $("#dataContent").empty();
-        var template = "";
-        data.complexs.forEach(function(item) {
-            template += "<p><span>" + "[" +  item.complexNo + "]" + item.complexName + "(" + item.updateAt + ")</span>";
-            template += "<a href='" + item.landDataUrl + "'>[바로보기]</a>";
-            template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='조회하기'/>";
-            template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='업데이트'/></p>";
-        })
-        $("#dataContent").append(template);
+        $("#dataContent").append(renderTemplate(data));
     })
+}
+
+function renderTemplate(data) {
+    var template = "";
+    data.complexs.forEach(function(item) {
+        template += "<div>"
+        template += "<span style='font-weight: bold'>[" +  item.complexNo + "]" + item.complexName + "(" + item.updateAt + ")</span>";
+        template += "<a href='" + item.landDataUrl + "' target='_blank'>[바]</a>";
+        template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='조'/>";
+        template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='업'/>";
+        item.complexPyeongVOList.forEach(function(pyeong) {
+            template += "<span>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
+            template += "<span>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
+                pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ")]</span>";
+        })
+        template += "</div>"
+    });
+    return template;
 }
 
 // 단건 조회
