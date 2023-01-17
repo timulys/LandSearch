@@ -36,9 +36,9 @@ function renderTemplate(data) {
     data.complexs.forEach(function(item) {
         template += "<div>"
         template += "<span style='font-weight: bold'>[" +  item.complexNo + "]" + item.complexName + "(" + item.updateAt + ")</span>";
-        template += "<a href='" + item.landDataUrl + "' target='_blank'>[바]</a>";
-        template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='조'/>";
-        template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='업'/>";
+        template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
+        template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='H'/>";
+        template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='U'/>";
         item.complexPyeongVOList.forEach(function(pyeong) {
             template += "<span>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
             template += "<span>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +

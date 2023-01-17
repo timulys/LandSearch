@@ -8,6 +8,7 @@ import com.naver.landsearch.domain.price.ComplexRealPrice;
 import com.naver.landsearch.domain.price.LandPriceMaxByPtp;
 import com.naver.landsearch.domain.realprice.Price;
 import com.naver.landsearch.domain.realprice.RealPrice;
+import com.naver.landsearch.domain.vo.ArticleVO;
 import com.naver.landsearch.domain.vo.ComplexPyeongVO;
 import com.naver.landsearch.dto.LandDataDTO;
 import com.naver.landsearch.domain.vo.ComplexVO;
@@ -157,14 +158,37 @@ public class LandDataService {
 	}
 
 	public ComplexDetail getLandData(String complexCode) {
+		// TODO : CreateDate별 조회 가능하도록 ViewVO List로 변환
+		List<ArticleVO> complexArticleList = new ArrayList<>();
+		// 데이터 조회
 		ComplexDetail complexDetail = complexDetailRepository.findById(complexCode).orElseThrow(NullPointerException::new);
 		for (ComplexPyeongDetail complexPyeongDetail : complexDetail.getComplexPyeongDetailList()) {
 			ArticleStatistics articleStatistics = complexPyeongDetail.getArticleStatistics();
-			LandPriceMaxByPtp landPriceMaxByPtp = complexPyeongDetail.getLandPriceMaxByPtp();
-			ComplexRealPrice realDealPrice = complexPyeongDetail.getRealDealPrice();
-			System.out.println(complexPyeongDetail.getPyeongName2() + " 매매 : " + realDealPrice.getFormattedPrice());
-			ComplexRealPrice realLeasePrice = complexPyeongDetail.getRealLeasePrice();
-			System.out.println(complexPyeongDetail.getPyeongName2() + " 전세 : " + realLeasePrice.getFormattedPrice());
+			complexArticleList.add(ArticleVO.builder()
+				.complexNo(complexDetail.getComplexNo())
+				.complexName(complexDetail.getComplexName())
+				.landDataUrl(complexDetail.getLandDataUrl())
+				.pyeongName(complexPyeongDetail.getPyeongName())
+				.pyeongName2(complexPyeongDetail.getPyeongName2())
+					.dealCount(articleStatistics.getDealCount())
+					.leaseCount(articleStatistics.getLeaseCount())
+					.rentCount(articleStatistics.getRentCount())
+					.dealPriceMin(articleStatistics.getDealPriceMin())
+					.dealPricePerSpaceMin(articleStatistics.getDealPricePerSpaceMin())
+					.dealPriceMax(articleStatistics.getDealPriceMax())
+					.dealPricePerSpaceMax(articleStatistics.getDealPricePerSpaceMax())
+					.leasePriceMin(articleStatistics.getLeasePriceMin())
+					.leasePricePerSpaceMin(articleStatistics.getLeasePricePerSpaceMin())
+					.leasePriceMax(articleStatistics.getLeasePriceMax())
+					.leasePricePerSpaceMax(articleStatistics.getLeasePricePerSpaceMax())
+					.createdAt(articleStatistics.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+				.build()
+			);
+//			LandPriceMaxByPtp landPriceMaxByPtp = complexPyeongDetail.getLandPriceMaxByPtp();
+//			ComplexRealPrice realDealPrice = complexPyeongDetail.getRealDealPrice();
+//			System.out.println(complexPyeongDetail.getPyeongName2() + " 매매 : " + realDealPrice.getFormattedPrice());
+//			ComplexRealPrice realLeasePrice = complexPyeongDetail.getRealLeasePrice();
+//			System.out.println(complexPyeongDetail.getPyeongName2() + " 전세 : " + realLeasePrice.getFormattedPrice());
 		}
 		return complexDetail;
 	}

@@ -1,36 +1,34 @@
-package com.naver.landsearch.domain.price;
+package com.naver.landsearch.domain.vo;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.naver.landsearch.domain.BaseDomain;
-import com.naver.landsearch.domain.CreateDomain;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import javax.persistence.*;
+import lombok.*;
 
 /**
- * PackageName 	: com.naver.landsearch.domain
- * FileName 	: ArticleStatistics
+ * PackageName 	: com.naver.landsearch.domain.vo
+ * FileName 	: ArticleVO
  * Author 		: jhchoi
- * Date 		: 2022-12-29
- * Description 	: 평형 별 가격 정보 도메인
+ * Date 		: 2023-01-17
+ * Description 	:
  * ======================================================
  * DATE				    AUTHOR				NOTICE
  * ======================================================
- * 2022-12-29			jhchoi				최초 생성
+ * 2023-01-17			jhchoi				최초 생성
  */
-@Entity
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Table
-public class ArticleStatistics extends CreateDomain {
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "article_id")
-	private Long id;
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ArticleVO {
+	// 단지 코드
+	private String complexNo;
+	// 단지 이름
+	private String complexName;
+	// 네이버 부동산 Direct URL
+	private String landDataUrl;
+	// 해당 타입
+	private String pyeongName;
+	// 해당 타입(평)
+	private String pyeongName2;
 	// 해당 타입 매매매물 수
 	private String dealCount;
 	// 해당 타입 전세매물 수
@@ -57,12 +55,6 @@ public class ArticleStatistics extends CreateDomain {
 	private String leasePriceRateMin;
 	// 해당 타입 전세가율 최고
 	private String leasePriceRateMax;
-	// 해당 타입 최저 월세 보증금
-	private String rentDepositPriceMin;
-	// 해당 타입 최저 월세
-	private String rentPriceMin;
-	// 해당 타입 최고 월세 보증금
-	private String rentDepositPriceMax;
-	// 해당 타입 최고 월세
-	private String rentPriceMax;
+	// 생성 일자
+	private String createdAt;
 }
