@@ -35,7 +35,7 @@ function renderTemplate(data) {
     var template = "";
     data.complexs.forEach(function(item) {
         template += "<div>"
-        template += "<span style='font-weight: bold'>[" +  item.complexNo + "]" + item.complexName + "(" + item.updateAt + ")</span>";
+        template += "<span style='font-weight: bold'>[" +  item.address + "]" + item.complexName + "(" + item.updateAt + ")</span>";
         template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
         template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='H'/>";
         template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='U'/>";
@@ -64,11 +64,25 @@ function dataSelectByCode(code) {
         url: url,
         data: param,
         type: "GET",
-    }).done((landData) => {
+    }).done((data) => {
         $("#dataContent").empty();
-        $("#dataContent").append(landData);
-        var obj = JSON.parse(landData);
-        $("#dataContent").append("<br/><a href='" + obj.landDataUrl + "'>[바로보기]</a>");
-        // $("#link").attr("href", obj.landDataUrl);
+        var template = "";
+        template += "<span sylte='font-weight: bold'>" + data.complexName + "</span>";
+        template += "<a href='" + data.url + "' target='_blank'>[V]</a>";
+        data.articles.forEach(function(article) {
+            template += "<p>"
+            template += "<span>" + article.createdAt + "</span><br/>";
+            template += "<span>" + article.pyeongName2 + "(" + article.dealCount
+                + " / " + article.leaseCount + " / " + article.rentCount + ")</span><br/>";
+            template += "<span>최저매매가 : " + article.dealPriceMin + "(" + article.dealPricePerSpaceMin + ")</span><br/>";
+            template += "<span>최저전세가 : " + article.leasePriceMin + "(" + article.leasePricePerSpaceMin + ")</span><br/>";
+            template += "<span>최고매매가 : " + article.dealPriceMax + "(" + article.dealPricePerSpaceMax + ")</span><br/>";
+            template += "<span>최고전세가 : " + article.leasePriceMax + "(" + article.leasePricePerSpaceMax + ")</span><br/>";
+            template += "<span>전세가율(최저/최고) : " + article.leasePriceRateMin  + " / " +
+                article.leasePriceRateMax + "</span><br/>";
+            template += "</p>";
+            template += "<hr/>"
+        })
+        $("#dataContent").append(template);
     })
 }

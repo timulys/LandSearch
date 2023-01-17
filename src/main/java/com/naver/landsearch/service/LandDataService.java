@@ -118,7 +118,7 @@ public class LandDataService {
 	public List<ComplexVO> selectAllLandDataVO() {
 		List<ComplexVO> resultList = new ArrayList<>();
 		// UI 표현 가능하도록 변경
-		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll();
+		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll(Sort.by(Sort.Direction.ASC, "address"));
 		complexDetailList.forEach(complex -> {
 			int pyeongTypes = complex.getPyoengNames().split(",").length;
 			List<ComplexPyeongVO> splitPyeongList = new ArrayList<>();
@@ -148,6 +148,7 @@ public class LandDataService {
 			resultList.add(ComplexVO.builder()
 				.complexNo(complex.getComplexNo())
 				.complexName(complex.getComplexName())
+				.address(complex.getAddress())
 				.landDataUrl(complex.getLandDataUrl())
 				.updateAt(complex.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 				.complexPyeongVOList(splitPyeongList)
@@ -157,40 +158,39 @@ public class LandDataService {
 		return resultList;
 	}
 
-	public ComplexDetail getLandData(String complexCode) {
+	public List<ArticleVO> getLandData(String complexCode) {
 		// TODO : CreateDate별 조회 가능하도록 ViewVO List로 변환
 		List<ArticleVO> complexArticleList = new ArrayList<>();
 		// 데이터 조회
 		ComplexDetail complexDetail = complexDetailRepository.findById(complexCode).orElseThrow(NullPointerException::new);
 		for (ComplexPyeongDetail complexPyeongDetail : complexDetail.getComplexPyeongDetailList()) {
-			ArticleStatistics articleStatistics = complexPyeongDetail.getArticleStatistics();
-			complexArticleList.add(ArticleVO.builder()
-				.complexNo(complexDetail.getComplexNo())
-				.complexName(complexDetail.getComplexName())
-				.landDataUrl(complexDetail.getLandDataUrl())
-				.pyeongName(complexPyeongDetail.getPyeongName())
-				.pyeongName2(complexPyeongDetail.getPyeongName2())
-					.dealCount(articleStatistics.getDealCount())
-					.leaseCount(articleStatistics.getLeaseCount())
-					.rentCount(articleStatistics.getRentCount())
-					.dealPriceMin(articleStatistics.getDealPriceMin())
-					.dealPricePerSpaceMin(articleStatistics.getDealPricePerSpaceMin())
-					.dealPriceMax(articleStatistics.getDealPriceMax())
-					.dealPricePerSpaceMax(articleStatistics.getDealPricePerSpaceMax())
-					.leasePriceMin(articleStatistics.getLeasePriceMin())
-					.leasePricePerSpaceMin(articleStatistics.getLeasePricePerSpaceMin())
-					.leasePriceMax(articleStatistics.getLeasePriceMax())
-					.leasePricePerSpaceMax(articleStatistics.getLeasePricePerSpaceMax())
-					.createdAt(articleStatistics.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-				.build()
-			);
-//			LandPriceMaxByPtp landPriceMaxByPtp = complexPyeongDetail.getLandPriceMaxByPtp();
-//			ComplexRealPrice realDealPrice = complexPyeongDetail.getRealDealPrice();
-//			System.out.println(complexPyeongDetail.getPyeongName2() + " 매매 : " + realDealPrice.getFormattedPrice());
-//			ComplexRealPrice realLeasePrice = complexPyeongDetail.getRealLeasePrice();
-//			System.out.println(complexPyeongDetail.getPyeongName2() + " 전세 : " + realLeasePrice.getFormattedPrice());
+			if (complexPyeongDetail.getArticleStatistics() != null) {
+				ArticleStatistics articleStatistics = complexPyeongDetail.getArticleStatistics();
+				complexArticleList.add(ArticleVO.builder()
+						.complexNo(complexDetail.getComplexNo())
+						.complexName(complexDetail.getComplexName())
+						.landDataUrl(complexDetail.getLandDataUrl())
+						.pyeongName(complexPyeongDetail.getPyeongName())
+						.pyeongName2(complexPyeongDetail.getPyeongName2())
+						.dealCount(articleStatistics.getDealCount())
+						.leaseCount(articleStatistics.getLeaseCount())
+						.rentCount(articleStatistics.getRentCount())
+						.dealPriceMin(articleStatistics.getDealPriceMin())
+						.dealPricePerSpaceMin(articleStatistics.getDealPricePerSpaceMin())
+						.dealPriceMax(articleStatistics.getDealPriceMax())
+						.dealPricePerSpaceMax(articleStatistics.getDealPricePerSpaceMax())
+						.leasePriceMin(articleStatistics.getLeasePriceMin())
+						.leasePricePerSpaceMin(articleStatistics.getLeasePricePerSpaceMin())
+						.leasePriceMax(articleStatistics.getLeasePriceMax())
+						.leasePricePerSpaceMax(articleStatistics.getLeasePricePerSpaceMax())
+						.leasePriceRateMin(articleStatistics.getLeasePriceRateMin())
+						.leasePriceRateMax(articleStatistics.getLeasePriceRateMax())
+						.createdAt(articleStatistics.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+						.build()
+				);
+			}
 		}
-		return complexDetail;
+		return complexArticleList;
 	}
 
 	////////////////////// private methods //////////////////////

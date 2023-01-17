@@ -28,6 +28,8 @@ public class ComplexVO {
 	private String complexName;
 	// 네이버 부동산 Direct URL
 	private String landDataUrl;
+	// 단지 주소
+	private String address;
 	// 제곱미터 평형 면적
 	private String supplyArea;
 	// 평 타입 이름

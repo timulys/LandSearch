@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.naver.landsearch.domain.complex.ComplexDetail;
+import com.naver.landsearch.domain.vo.ArticleVO;
 import com.naver.landsearch.domain.vo.ComplexVO;
 import com.naver.landsearch.service.LandDataService;
 import lombok.RequiredArgsConstructor;
@@ -66,13 +67,15 @@ public class RestLandSearchController {
 	}
 
 	@GetMapping("/getByCode")
-	public ResponseEntity getComplexInfoByCode(@RequestParam("complexCode") String complexCode, Model model) {
-		try {
-			ComplexDetail complexDetail = landDataService.getLandData(complexCode);
-			ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
-			return new ResponseEntity<>(mapper.writeValueAsString(complexDetail), HttpStatus.OK);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+	public ResponseEntity getComplexInfoByCode(@RequestParam("complexCode") String complexCode) {
+		List<ArticleVO> articles = landDataService.getLandData(complexCode);
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexName", articles.get(0).getComplexName());
+		result.put("url", articles.get(0).getLandDataUrl());
+		result.put("articles", articles);
+		if (articles != null) {
+			return ResponseEntity.ok().body(result);
 		}
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
