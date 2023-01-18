@@ -71,10 +71,10 @@ function dataSelectByCode(code) {
         template += "<span sylte='font-weight: bold'>" + data.complexName + "</span>";
         template += "<a href='" + data.url + "' target='_blank'>[V]</a>";
         data.articles.forEach(function(article) {
-            if (createdAt == "" || createdAt != article.createdAt.substring(0, 10)) {
-                createdAt = article.createdAt.substring(0, 10);
+            if (createdAt == "" || createdAt != article.createdAt.substring(0, 16)) {
+                createdAt = article.createdAt.substring(0, 16);
+                template += "<div></div>"
                 template += "<hr/>";
-                template += "<br/>"
             }
             template += "<div class='float'>"
             template += "<span>" + article.createdAt + "</span><br/>";
