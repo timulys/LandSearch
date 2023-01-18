@@ -70,22 +70,27 @@ function dataSelectByCode(code) {
         var template = "";
         template += "<span sylte='font-weight: bold'>" + data.complexName + "</span>";
         template += "<a href='" + data.url + "' target='_blank'>[V]</a>";
+        template += "<hr/>";
         data.articles.forEach(function(article) {
-            if (createdAt == "" || createdAt != article.createdAt.substring(0, 16)) {
+            if (createdAt == "") {
                 createdAt = article.createdAt.substring(0, 16);
-                template += "<div></div>"
-                template += "<hr/>";
+            }
+            if (createdAt != article.createdAt.substring(0, 16)) {
+                createdAt = article.createdAt.substring(0, 16);
+                template += "<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>";
+                template += "<hr/>"
             }
             template += "<div class='float'>"
             template += "<span>" + article.createdAt + "</span><br/>";
-            template += "<span>" + article.pyeongName2 + "(" + article.dealCount
+            template += "<span>" + article.pyeongName2 + " (" + article.dealCount
                 + " / " + article.leaseCount + " / " + article.rentCount + ")</span><br/>";
             template += "<span>최저매매가 : " + article.dealPriceMin + "(" + article.dealPricePerSpaceMin + ")</span><br/>";
             template += "<span>최저전세가 : " + article.leasePriceMin + "(" + article.leasePricePerSpaceMin + ")</span><br/>";
             template += "<span>최고매매가 : " + article.dealPriceMax + "(" + article.dealPricePerSpaceMax + ")</span><br/>";
             template += "<span>최고전세가 : " + article.leasePriceMax + "(" + article.leasePricePerSpaceMax + ")</span><br/>";
-            template += "<span>전세가율(최저/최고) : " + article.leasePriceRateMin  + " / " +
-                article.leasePriceRateMax + "</span><br/>";
+            template += "<span>전세가율(최저/최고) : " + article.leasePriceRateMin + " / " + article.leasePriceRateMax + "</span><br/>";
+            template += "<span>매매실거래 : " + article.realDealPrice + "(" + article.realDealDate + ")</span><br/>";
+            template += "<span>전세실거래 : " + article.realLeasePrice + "(" + article.realLeaseDate + ")</span><br/>";
             template += "</div>";
         })
         $("#dataContent").append(template);

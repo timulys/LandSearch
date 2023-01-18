@@ -185,6 +185,18 @@ public class LandDataService {
 						.leasePricePerSpaceMax(articleStatistics.getLeasePricePerSpaceMax())
 						.leasePriceRateMin(articleStatistics.getLeasePriceRateMin())
 						.leasePriceRateMax(articleStatistics.getLeasePriceRateMax())
+								.realDealPrice(complexPyeongDetail.getRealDealPrice().getFormattedPrice())
+								.realDealDate(
+										complexPyeongDetail.getRealDealPrice().getTradeYear() + "/" +
+										complexPyeongDetail.getRealDealPrice().getTradeMonth() + "/" +
+										complexPyeongDetail.getRealDealPrice().getTradeDate()
+								)
+								.realLeasePrice(complexPyeongDetail.getRealLeasePrice().getFormattedPrice())
+								.realLeaseDate(
+										complexPyeongDetail.getRealLeasePrice().getTradeYear() + "/" +
+										complexPyeongDetail.getRealLeasePrice().getTradeMonth() + "/" +
+										complexPyeongDetail.getRealLeasePrice().getTradeDate()
+								)
 						.createdAt(articleStatistics.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 						.build()
 				);

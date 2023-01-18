@@ -55,6 +55,14 @@ public class ArticleVO {
 	private String leasePriceRateMin;
 	// 해당 타입 전세가율 최고
 	private String leasePriceRateMax;
+	// 최근 매매 실거래가
+	private String realDealPrice;
+	// 최근 매매 거래 일자
+	private String realDealDate;
+	// 최근 전세 실거래가
+	private String realLeasePrice;
+	// 최근 전세 거래 일자
+	private String realLeaseDate;
 	// 생성 일자
 	private String createdAt;
 }
