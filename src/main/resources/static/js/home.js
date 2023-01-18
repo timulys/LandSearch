@@ -66,11 +66,17 @@ function dataSelectByCode(code) {
         type: "GET",
     }).done((data) => {
         $("#dataContent").empty();
+        var createdAt = "";
         var template = "";
         template += "<span sylte='font-weight: bold'>" + data.complexName + "</span>";
         template += "<a href='" + data.url + "' target='_blank'>[V]</a>";
         data.articles.forEach(function(article) {
-            template += "<p>"
+            if (createdAt == "" || createdAt != article.createdAt.substring(0, 10)) {
+                createdAt = article.createdAt.substring(0, 10);
+                template += "<hr/>";
+                template += "<br/>"
+            }
+            template += "<div class='float'>"
             template += "<span>" + article.createdAt + "</span><br/>";
             template += "<span>" + article.pyeongName2 + "(" + article.dealCount
                 + " / " + article.leaseCount + " / " + article.rentCount + ")</span><br/>";
@@ -80,8 +86,7 @@ function dataSelectByCode(code) {
             template += "<span>최고전세가 : " + article.leasePriceMax + "(" + article.leasePricePerSpaceMax + ")</span><br/>";
             template += "<span>전세가율(최저/최고) : " + article.leasePriceRateMin  + " / " +
                 article.leasePriceRateMax + "</span><br/>";
-            template += "</p>";
-            template += "<hr/>"
+            template += "</div>";
         })
         $("#dataContent").append(template);
     })
