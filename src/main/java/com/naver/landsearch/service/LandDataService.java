@@ -28,7 +28,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * PackageName 	: com.naver.landsearch.service
@@ -61,8 +63,12 @@ public class LandDataService {
 	private final ComplexRealPriceRepository complexRealPriceRepository;
 
 	// Service methods
+	public List<String> selectAllComplexCode() {
+		return complexDetailRepository.findAll().stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
+	}
+
 	public void saveLandData(String complexCode) {
-		try { // TODO : 각 서비스 모듈 간 메소드 분리 작업 진행
+		try {
 			// 네이버 부동산 조회 URL
 			String url = LAND + complexCode;
 			// 네이버 부동산 데이터 조회 URL

@@ -15,6 +15,20 @@ function dataSelectAll() {
     })
 }
 
+function dataUpdateAll() {
+    if (confirm("시간이 다소 소요됩니다. 정말 업데이트 하시겠습니까?")) {
+        $.ajax({
+            url: "http://localhost:9090/api/allUpdate",
+            type: "GET",
+        }).done((data) => {
+            console.log(data);
+            $("#dataContent").empty();
+        })
+    } else {
+        return false;
+    }
+}
+
 // 데이터 저장 및 조회
 function dataSendByCode(code) {
     var param = {
@@ -33,9 +47,9 @@ function dataSendByCode(code) {
 
 function renderTemplate(data) {
     var template = "";
-    data.complexs.forEach(function(item) {
+    data.complexs.forEach(function(item, index) {
         template += "<div>"
-        template += "<span style='font-weight: bold'>[" +  item.address + "]" + item.complexName + "(" + item.updateAt + ")</span>";
+        template += "<span style='font-weight: bold'>[" + index +  "." + item.address + "]" + item.complexName + "(" + item.updateAt + ")</span>";
         template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
         template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='H'/>";
         template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='U'/>";
