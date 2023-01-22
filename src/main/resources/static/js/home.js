@@ -49,12 +49,12 @@ function renderTemplate(data) {
     var template = "";
     data.complexs.forEach(function(item, index) {
         template += "<div>"
-        template += "<span style='font-weight: bold'>[" + index +  "." + item.address + "]" + item.complexName + "(" + item.updateAt + ")</span>";
+        template += "<span style='font-weight: bold'>[" + (index+1) +  "." + item.address + "]" + item.complexName + "(" + item.updateAt + ")</span>";
         template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
         template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='H'/>";
         template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='U'/>";
         item.complexPyeongVOList.forEach(function(pyeong) {
-            template += "<span>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
+            template += "<span style='font-weight: bold'>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
             template += "<span>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
                 pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ")]</span>";
         })

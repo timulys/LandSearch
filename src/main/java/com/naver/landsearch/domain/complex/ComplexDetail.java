@@ -71,13 +71,13 @@ public class ComplexDetail extends BaseDomain {
 
 	// 추후 검색을 위해 주소를 분리
 	@Column
-	private String address_1; // 도, 시
+	private String address1; // 도, 시
 	@Column
-	private String address_2; // 시, 구
+	private String address2; // 시, 구
 	@Column
-	private String address_3; // 구, 동, 읍, 면
+	private String address3; // 구, 동, 읍, 면
 	@Column
-	private String address_4; // 동, 읍, 면
+	private String address4; // 동, 읍, 면
 	
 	// 연관관계 매핑
 	@JsonManagedReference
@@ -86,10 +86,10 @@ public class ComplexDetail extends BaseDomain {
 
 	public void splitAddress() {
 		String[] split = this.address.split(" ");
-		this.address_1 = split[0];
-		this.address_2 = split[1];
-		this.address_3 = split[2];
+		this.address1 = split[0];
+		this.address2 = split[1];
+		this.address3 = split[2];
 		if (split.length >= 4)
-			this.address_4 = split[3];
+			this.address4 = split[3];
 	}
 }

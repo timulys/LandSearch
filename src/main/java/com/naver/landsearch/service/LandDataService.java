@@ -124,7 +124,7 @@ public class LandDataService {
 	public List<ComplexVO> selectAllLandDataVO() {
 		List<ComplexVO> resultList = new ArrayList<>();
 		// UI 표현 가능하도록 변경
-		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll(Sort.by(Sort.Direction.ASC, "address"));
+		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll(Sort.by(Sort.Direction.ASC, "address", "address2", "address3", "complexName"));
 		complexDetailList.forEach(complex -> {
 			int pyeongTypes = complex.getPyoengNames().split(",").length;
 			List<ComplexPyeongVO> splitPyeongList = new ArrayList<>();
