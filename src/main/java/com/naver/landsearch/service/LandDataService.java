@@ -165,13 +165,13 @@ public class LandDataService {
 	}
 
 	public List<ArticleVO> getLandData(String complexCode) {
-		// TODO : CreateDate별 조회 가능하도록 ViewVO List로 변환
 		List<ArticleVO> complexArticleList = new ArrayList<>();
 		// 데이터 조회
 		ComplexDetail complexDetail = complexDetailRepository.findById(complexCode).orElseThrow(NullPointerException::new);
 		for (ComplexPyeongDetail complexPyeongDetail : complexDetail.getComplexPyeongDetailList()) {
 			if (complexPyeongDetail.getArticleStatistics() != null) {
 				ArticleStatistics articleStatistics = complexPyeongDetail.getArticleStatistics();
+				// TODO : 데이터 변환이 있으면 표시를 해야 함. (최근 실거래가? 호가변경? 매물건수?)
 				complexArticleList.add(ArticleVO.builder()
 						.complexNo(complexDetail.getComplexNo())
 						.complexName(complexDetail.getComplexName())

@@ -86,7 +86,7 @@ public class RestLandSearchController {
 		List<String> complexCodeList = landDataService.selectAllComplexCode();
 		System.out.println("=============== 업데이트 시작 : " + System.currentTimeMillis() + "===============");
 		for (String complexCode : complexCodeList) {
-			System.out.println("=============== " +  complexCode + " 업데이트 시작 ===============");
+			System.out.println("=============== " + complexCode + " 업데이트 시작 ===============");
 			landDataService.saveLandData(complexCode);
 		}
 		System.out.println("=============== 업데이트 완료 : " + System.currentTimeMillis() + "===============");
