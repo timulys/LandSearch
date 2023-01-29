@@ -82,6 +82,7 @@ public class ComplexDetail extends BaseDomain {
 	// 연관관계 매핑
 	@JsonManagedReference
 	@OneToMany(mappedBy = "complexDetail")
+	@ToString.Exclude
 	private List<ComplexPyeongDetail> complexPyeongDetailList;
 
 	public void splitAddress() {

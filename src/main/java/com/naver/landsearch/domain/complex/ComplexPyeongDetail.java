@@ -6,10 +6,7 @@ import com.naver.landsearch.domain.price.ArticleStatistics;
 import com.naver.landsearch.domain.BaseDomain;
 import com.naver.landsearch.domain.price.ComplexRealPrice;
 import com.naver.landsearch.domain.price.LandPriceMaxByPtp;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -81,5 +78,6 @@ public class ComplexPyeongDetail {
 	@JsonBackReference
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "complex_no")
+	@ToString.Exclude
 	private ComplexDetail complexDetail;
 }

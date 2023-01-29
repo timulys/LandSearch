@@ -6,6 +6,7 @@ function dataSend() {
 // 전체 데이터 조회
 function dataSelectAll() {
     var url = "http://localhost:9090/api/allData";
+    // var url = "http://192.168.55.81:9090/api/allData";
     $.ajax({
         url: url,
         type: "GET",
@@ -19,6 +20,7 @@ function dataUpdateAll() {
     if (confirm("시간이 다소 소요됩니다. 정말 업데이트 하시겠습니까?")) {
         $.ajax({
             url: "http://localhost:9090/api/allUpdate",
+            // url: "http://192.168.55.81:9090/api/allUpdate",
             type: "GET",
         }).done((data) => {
             console.log(data);
@@ -35,6 +37,7 @@ function dataSendByCode(code) {
         complexCode : code
     };
     var url = "http://localhost:9090/api/landByCode";
+    // var url = "http://192.168.55.81:9090/api/landByCode";
     $.ajax({
         url: url,
         data: param,
@@ -54,8 +57,8 @@ function renderTemplate(data) {
         template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='H'/>";
         template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='U'/>";
         item.complexPyeongVOList.forEach(function(pyeong) {
-            template += "<span style='font-weight: bold'>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
-            template += "<span>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
+            template += "<span style='font-weight: bold; font-size: 7px'>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
+            template += "<span style='font-size: 6px'>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
                 pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ")]</span>";
         })
         template += "</div>"
@@ -74,6 +77,7 @@ function dataSelectByCode(code) {
         complexCode : code
     };
     var url = "http://localhost:9090/api/getByCode";
+    // var url = "http://192.168.55.81:9090/api/getByCode";
     $.ajax({
         url: url,
         data: param,

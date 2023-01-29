@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.0'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'war'
 }
 
 group = 'com.naver'
@@ -16,6 +17,10 @@ configurations {
 
 repositories {
     mavenCentral()
+}
+
+bootJar {
+    mainClass = 'com.naver.landsearch.LandsearchApplicaion'
 }
 
 dependencies {
