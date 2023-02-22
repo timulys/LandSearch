@@ -31,4 +31,6 @@ public class ComplexPyeongVO {
 	private String leasePriceMin;
 	// 전세 최저가 평당가
 	private String leasePricePerSpaceMin;
+	// 최저 전세가율
+	private String leasePriceRateMin;
 }

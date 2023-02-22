@@ -67,7 +67,7 @@ public class LandDataService {
 		return complexDetailRepository.findAll().stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
 	}
 
-	public void saveLandData(String complexCode) {
+	public ComplexVO saveLandData(String complexCode) {
 		try {
 			// 네이버 부동산 조회 URL
 			String url = LAND + complexCode;
@@ -116,9 +116,16 @@ public class LandDataService {
 				// 평형 정보
 				complexPyeongDetailRepository.save(complexPyeongDetail);
 			}
+
+			return ComplexVO.builder()
+					.address(landDataDTO.getComplexDetail().getAddress())
+					.complexName(landDataDTO.getComplexDetail().getComplexName())
+					.complexNo(landDataDTO.getComplexDetail().getComplexNo())
+					.build();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	public List<ComplexVO> selectAllLandDataVO() {
@@ -142,6 +149,8 @@ public class LandDataService {
 							pyeong.getArticleStatistics().getLeasePriceMin() : "0")
 						.leasePricePerSpaceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePricePerSpaceMin() != null ?
 							pyeong.getArticleStatistics().getLeasePricePerSpaceMin() : "0")
+						.leasePriceRateMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePriceRateMin() != null ?
+							pyeong.getArticleStatistics().getLeasePriceRateMin() : "0")
 						.build());
 				});
 			}
@@ -191,18 +200,18 @@ public class LandDataService {
 						.leasePricePerSpaceMax(articleStatistics.getLeasePricePerSpaceMax())
 						.leasePriceRateMin(articleStatistics.getLeasePriceRateMin())
 						.leasePriceRateMax(articleStatistics.getLeasePriceRateMax())
-								.realDealPrice(complexPyeongDetail.getRealDealPrice().getFormattedPrice())
-								.realDealDate(
-										complexPyeongDetail.getRealDealPrice().getTradeYear() + "/" +
-										complexPyeongDetail.getRealDealPrice().getTradeMonth() + "/" +
-										complexPyeongDetail.getRealDealPrice().getTradeDate()
-								)
-								.realLeasePrice(complexPyeongDetail.getRealLeasePrice().getFormattedPrice())
-								.realLeaseDate(
-										complexPyeongDetail.getRealLeasePrice().getTradeYear() + "/" +
-										complexPyeongDetail.getRealLeasePrice().getTradeMonth() + "/" +
-										complexPyeongDetail.getRealLeasePrice().getTradeDate()
-								)
+						.realDealPrice(complexPyeongDetail.getRealDealPrice().getFormattedPrice())
+						.realDealDate(
+								complexPyeongDetail.getRealDealPrice().getTradeYear() + "/" +
+								complexPyeongDetail.getRealDealPrice().getTradeMonth() + "/" +
+								complexPyeongDetail.getRealDealPrice().getTradeDate()
+						)
+						.realLeasePrice(complexPyeongDetail.getRealLeasePrice().getFormattedPrice())
+						.realLeaseDate(
+								complexPyeongDetail.getRealLeasePrice().getTradeYear() + "/" +
+								complexPyeongDetail.getRealLeasePrice().getTradeMonth() + "/" +
+								complexPyeongDetail.getRealLeasePrice().getTradeDate()
+						)
 						.createdAt(articleStatistics.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 						.build()
 				);

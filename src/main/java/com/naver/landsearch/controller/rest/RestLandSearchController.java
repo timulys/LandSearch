@@ -41,16 +41,17 @@ public class RestLandSearchController {
 	@GetMapping("/landByCode")
 	public ResponseEntity<Map<String, Object>> saveComplexInfoByCode(@RequestParam("complexCode") String complexCode) {
 		// ComplexCode를 통한 신규 네이버 부동산 데이터 Insert/Update
-		landDataService.saveLandData(complexCode);
-		// 등록된 전체 Complex 목록 조회
-		List<ComplexVO> complexVOList = landDataService.selectAllLandDataVO();
-
 		Map<String, Object> result = new HashMap<>();
-		result.put("complexs", complexVOList);
-		if (complexVOList != null) {
+		ComplexVO complexVO = landDataService.saveLandData(complexCode);
+		result.put("complexVO", complexVO);
+//		// 등록된 전체 Complex 목록 조회
+//		List<ComplexVO> complexVOList = landDataService.selectAllLandDataVO();
+
+//		result.put("complexs", complexVOList);
+//		if (complexVOList != null) {
 			return ResponseEntity.ok().body(result);
-		}
-		return new ResponseEntity(HttpStatus.NO_CONTENT);
+//		}
+//		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
 
 	@GetMapping("/allData")

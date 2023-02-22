@@ -5,8 +5,8 @@ function dataSend() {
 
 // 전체 데이터 조회
 function dataSelectAll() {
-    var url = "http://localhost:9090/api/allData";
-    // var url = "http://192.168.55.81:9090/api/allData";
+    // var url = "http://localhost:9090/api/allData";
+    var url = "http://192.168.55.81:9090/api/allData";
     $.ajax({
         url: url,
         type: "GET",
@@ -19,8 +19,8 @@ function dataSelectAll() {
 function dataUpdateAll() {
     if (confirm("시간이 다소 소요됩니다. 정말 업데이트 하시겠습니까?")) {
         $.ajax({
-            url: "http://localhost:9090/api/allUpdate",
-            // url: "http://192.168.55.81:9090/api/allUpdate",
+            // url: "http://localhost:9090/api/allUpdate",
+            url: "http://192.168.55.81:9090/api/allUpdate",
             type: "GET",
         }).done((data) => {
             console.log(data);
@@ -36,15 +36,17 @@ function dataSendByCode(code) {
     var param = {
         complexCode : code
     };
-    var url = "http://localhost:9090/api/landByCode";
-    // var url = "http://192.168.55.81:9090/api/landByCode";
+    // var url = "http://localhost:9090/api/landByCode";
+    var url = "http://192.168.55.81:9090/api/landByCode";
     $.ajax({
         url: url,
         data: param,
         type: "GET",
     }).done((data) => {
-        $("#dataContent").empty();
-        $("#dataContent").append(renderTemplate(data));
+        var complexVO = data.complexVO;
+        // $("#dataContent").empty();
+        $("#dataContent").append("<span style='font-weight: bold'>[" + complexVO.address + "]" + complexVO.complexName + "(" + complexVO.complexNo + ") 업데이트 완료</span></br>");
+        // $("#dataContent").append(renderTemplate(data));
     })
 }
 
@@ -57,9 +59,15 @@ function renderTemplate(data) {
         template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='H'/>";
         template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='U'/>";
         item.complexPyeongVOList.forEach(function(pyeong) {
-            template += "<span style='font-weight: bold; font-size: 7px'>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
-            template += "<span style='font-size: 6px'>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
-                pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ")]</span>";
+            if (pyeong.leasePriceRateMin * 1 >= 70) {
+                template += "<span style='font-weight: bold; color: red;'>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
+                template += "<span style='font-weight: bold; color: red; font-size: 6px'>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
+                    pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ") : 전세가율(" + pyeong.leasePriceRateMin + ")]</span>";
+            } else {
+                template += "<span style='font-size: 8px'>:: " + pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
+                template += "<span style='font-size: 6px'>[" + pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
+                    pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ")]</span>";
+            }
         })
         template += "</div>"
     });
@@ -76,14 +84,14 @@ function dataSelectByCode(code) {
     var param = {
         complexCode : code
     };
-    var url = "http://localhost:9090/api/getByCode";
-    // var url = "http://192.168.55.81:9090/api/getByCode";
+    // var url = "http://localhost:9090/api/getByCode";
+    var url = "http://192.168.55.81:9090/api/getByCode";
     $.ajax({
         url: url,
         data: param,
         type: "GET",
     }).done((data) => {
-        $("#dataContent").empty();
+        $("#dialog").empty();
         var createdAt = "";
         var template = "";
         template += "<span sylte='font-weight: bold'>" + data.complexName + "</span>";
@@ -95,7 +103,7 @@ function dataSelectByCode(code) {
             }
             if (createdAt != article.createdAt.substring(0, 16)) {
                 createdAt = article.createdAt.substring(0, 16);
-                template += "<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>";
+                template += "<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>";
                 template += "<hr/>"
             }
             template += "<div class='float'>"
@@ -111,6 +119,13 @@ function dataSelectByCode(code) {
             template += "<span>전세실거래 : " + article.realLeasePrice + "(" + article.realLeaseDate + ")</span><br/>";
             template += "</div>";
         })
-        $("#dataContent").append(template);
+        $("#dialog").append(template);
+        $("#dialog").dialog({
+            title: '단지 조회',
+            modal: true,
+            resizable: true,
+            width: '2500',
+            height: '1000'
+        });
     })
 }
