@@ -151,6 +151,8 @@ public class LandDataService {
 							pyeong.getArticleStatistics().getLeasePricePerSpaceMin() : "0")
 						.leasePriceRateMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePriceRateMin() != null ?
 							pyeong.getArticleStatistics().getLeasePriceRateMin() : "0")
+						.landPriceMaxByPtp(pyeong.getLandPriceMaxByPtp() != null && pyeong.getLandPriceMaxByPtp().getMaxPrice() != null ?
+							pyeong.getLandPriceMaxByPtp().getMaxPrice() : "0")
 						.build());
 				});
 			}

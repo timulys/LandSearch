@@ -1,3 +1,6 @@
+// var origin = "http://localhost:9090/api/";
+var origin = "http://192.168.55.81:9090/api/";
+
 function dataSend() {
     var code = $("#complexCode").val();
     dataSendByCode(code);
@@ -5,8 +8,7 @@ function dataSend() {
 
 // 전체 데이터 조회
 function dataSelectAll() {
-    // var url = "http://localhost:9090/api/allData";
-    var url = "http://192.168.55.81:9090/api/allData";
+    var url = origin + "allData";
     $.ajax({
         url: url,
         type: "GET",
@@ -18,9 +20,9 @@ function dataSelectAll() {
 
 function dataUpdateAll() {
     if (confirm("시간이 다소 소요됩니다. 정말 업데이트 하시겠습니까?")) {
+        var url = origin + "allUpdate";
         $.ajax({
-            // url: "http://localhost:9090/api/allUpdate",
-            url: "http://192.168.55.81:9090/api/allUpdate",
+            url: url,
             type: "GET",
         }).done((data) => {
             console.log(data);
@@ -33,11 +35,10 @@ function dataUpdateAll() {
 
 // 데이터 저장 및 조회
 function dataSendByCode(code) {
+    var url = origin + "landByCode";
     var param = {
         complexCode : code
     };
-    // var url = "http://localhost:9090/api/landByCode";
-    var url = "http://192.168.55.81:9090/api/landByCode";
     $.ajax({
         url: url,
         data: param,
@@ -62,11 +63,14 @@ function renderTemplate(data) {
             if (pyeong.leasePriceRateMin * 1 >= 70) {
                 template += "<span style='font-weight: bold; color: red;'>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
                 template += "<span style='font-weight: bold; color: red; font-size: 6px'>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
-                    pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ") : 전세가율(" + pyeong.leasePriceRateMin + ")]</span>";
+                    pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ") : Rate(" + pyeong.leasePriceRateMin + ")]</span>";
             } else {
-                template += "<span style='font-size: 8px'>:: " + pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
+                template += "<span style='font-size: 6px'>:: " + pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
                 template += "<span style='font-size: 6px'>[" + pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
                     pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ")]</span>";
+            }
+            if (pyeong.landPriceMaxByPtp * 1 > 0 && pyeong.landPriceMaxByPtp * 1 <= 100000000) {
+                template += "<span style='font-weight: bold;'>[공]</span>";
             }
         })
         template += "</div>"
@@ -81,11 +85,10 @@ function dataSelect() {
 }
 
 function dataSelectByCode(code) {
+    var url = origin + "getByCode";
     var param = {
         complexCode : code
     };
-    // var url = "http://localhost:9090/api/getByCode";
-    var url = "http://192.168.55.81:9090/api/getByCode";
     $.ajax({
         url: url,
         data: param,
