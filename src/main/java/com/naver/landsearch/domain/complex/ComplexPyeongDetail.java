@@ -58,19 +58,19 @@ public class ComplexPyeongDetail {
 
 	// 연관관계 설정
 	// 평형별 가격 정보 매핑
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "article_id")
 	private ArticleStatistics articleStatistics;
 	// 공시지가 정보 매핑
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ptp_id")
 	private LandPriceMaxByPtp landPriceMaxByPtp;
 	// 매매 실거래가 정보 매핑
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "deal_price_id")
 	private ComplexRealPrice realDealPrice;
 	// 전세 실거래가 정보 매핑
-	@OneToOne(fetch=FetchType.EAGER)
+	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "lease_price_id")
 	private ComplexRealPrice realLeasePrice;
 
