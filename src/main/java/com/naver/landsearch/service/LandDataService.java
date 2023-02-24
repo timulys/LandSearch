@@ -5,7 +5,6 @@ import com.naver.landsearch.domain.complex.ComplexDetail;
 import com.naver.landsearch.domain.complex.ComplexPyeongDetail;
 import com.naver.landsearch.domain.price.ArticleStatistics;
 import com.naver.landsearch.domain.price.ComplexRealPrice;
-import com.naver.landsearch.domain.price.LandPriceMaxByPtp;
 import com.naver.landsearch.domain.realprice.Price;
 import com.naver.landsearch.domain.realprice.RealPrice;
 import com.naver.landsearch.domain.vo.ArticleVO;
@@ -22,13 +21,15 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,10 @@ public class LandDataService {
 	// 네이버 부동산 API URL
 	public static final String LAND_API = "https://new.land.naver.com/api/complexes/";
 
+	// File Load
+	private final static String FILE_PATH = "classpath:landdata_complex_detail.csv";
+	private final ResourceLoader resourceLoader;
+
 	// Dependency injection repositories
 	private final ComplexDetailRepository complexDetailRepository;
 	private final ComplexPyeongDetailRepository complexPyeongDetailRepository;
@@ -65,6 +70,28 @@ public class LandDataService {
 	// Service methods
 	public List<String> selectAllComplexCode() {
 		return complexDetailRepository.findAll().stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
+	}
+
+	public void codeSyncByCsv() {
+		// Complex Code Sync by CSV
+		List<String> codeList = new ArrayList<>();
+		BufferedReader reader = null;
+		try {
+			Resource resource = resourceLoader.getResource(FILE_PATH);
+			reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+			int i = 0;
+			String code = "";
+			while ((code = reader.readLine()) != null) {
+				// 해당 code가 존재하면 무시
+				boolean exists = complexDetailRepository.existsById(code);
+				if (!exists) {
+					System.out.println(i + " 번째 단지 : " + code);
+					saveLandData(code);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public ComplexVO saveLandData(String complexCode) {

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,20 +40,20 @@ public class RestLandSearchController {
 	// Autowired
 	public final LandDataService landDataService;
 
+	@GetMapping("/codeSync")
+	public ResponseEntity registerByCsv() {
+		landDataService.codeSyncByCsv();
+		return new ResponseEntity(HttpStatus.OK);
+	}
+
 	@GetMapping("/landByCode")
 	public ResponseEntity<Map<String, Object>> saveComplexInfoByCode(@RequestParam("complexCode") String complexCode) {
 		// ComplexCode를 통한 신규 네이버 부동산 데이터 Insert/Update
 		Map<String, Object> result = new HashMap<>();
 		ComplexVO complexVO = landDataService.saveLandData(complexCode);
 		result.put("complexVO", complexVO);
-//		// 등록된 전체 Complex 목록 조회
-//		List<ComplexVO> complexVOList = landDataService.selectAllLandDataVO();
 
-//		result.put("complexs", complexVOList);
-//		if (complexVOList != null) {
-			return ResponseEntity.ok().body(result);
-//		}
-//		return new ResponseEntity(HttpStatus.NO_CONTENT);
+		return ResponseEntity.ok().body(result);
 	}
 
 	@GetMapping("/allData")
