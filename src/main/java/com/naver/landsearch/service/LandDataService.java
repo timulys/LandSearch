@@ -85,6 +85,7 @@ public class LandDataService {
 				// 해당 code가 존재하면 무시
 				boolean exists = complexDetailRepository.existsById(code);
 				if (!exists) {
+					i++;
 					System.out.println(i + " 번째 단지 : " + code);
 					saveLandData(code);
 				}
