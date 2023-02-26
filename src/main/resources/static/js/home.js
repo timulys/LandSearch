@@ -1,5 +1,5 @@
-// var origin = "http://localhost:9090/api/";
-var origin = "http://192.168.55.81:9090/api/";
+var origin = "http://localhost:9090/api/";
+// var origin = "http://192.168.55.81:9090/api/";
 
 function dataSend() {
     var code = $("#complexCode").val();
