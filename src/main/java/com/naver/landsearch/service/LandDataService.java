@@ -88,8 +88,11 @@ public class LandDataService {
 					i++;
 					System.out.println(i + " 번째 단지 : " + code);
 					saveLandData(code);
+				} else {
+					System.out.println(code + " - 있음");
 				}
 			}
+			System.out.println("코드 입력 완료");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
