@@ -55,7 +55,7 @@ public class LandDataService {
 	public static final String LAND_API = "https://new.land.naver.com/api/complexes/";
 
 	// File Load
-	private final static String FILE_PATH = "classpath:landdata_complex_detail.csv";
+	private final static String FILE_PATH = "D:/landdata_complex_detail.csv";
 	private final ResourceLoader resourceLoader;
 
 	// Dependency injection repositories
@@ -77,8 +77,9 @@ public class LandDataService {
 		List<String> codeList = new ArrayList<>();
 		BufferedReader reader = null;
 		try {
-			Resource resource = resourceLoader.getResource(FILE_PATH);
-			reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+//			Resource resource = resourceLoader.getResource(FILE_PATH);
+//			reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+			reader = new BufferedReader(new FileReader(FILE_PATH));
 			int i = 0;
 			String code = "";
 			while ((code = reader.readLine()) != null) {
@@ -169,19 +170,49 @@ public class LandDataService {
 			List<ComplexPyeongVO> pyeongList = new ArrayList<>();
 			if (complex.getComplexPyeongDetailList() != null) {
 				complex.getComplexPyeongDetailList().forEach(pyeong -> {
+					String dealPriceMin = "0";
+					if (pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getDealPriceMin() != null) {
+						dealPriceMin = pyeong.getArticleStatistics().getDealPriceMin();
+						if (dealPriceMin.contains(" ")) {
+							dealPriceMin = dealPriceMin.replaceAll("억 ", "").replace(",", "");
+						} else {
+							if (dealPriceMin.contains(","))
+								dealPriceMin = dealPriceMin.replaceAll(",", "");
+							else
+							dealPriceMin = dealPriceMin.replaceAll("억", "0000");
+						}
+					}
+
+					String leasePriceMin = "0";
+					if (pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePriceMin() != null) {
+						leasePriceMin = pyeong.getArticleStatistics().getLeasePriceMin();
+						if (leasePriceMin.contains(" ")) {
+							leasePriceMin = leasePriceMin.replaceAll("억 ", "").replace(",", "");
+						} else {
+							if (leasePriceMin.contains(","))
+								leasePriceMin = leasePriceMin.replaceAll(",", "");
+							else
+								leasePriceMin = leasePriceMin.replaceAll("억", "0000");
+						}
+					}
+
+					String leasePriceRate = "0";
+					if (!"0".equals(dealPriceMin)) {
+						leasePriceRate = String.format("%.2f", (Double.valueOf(leasePriceMin) / Double.valueOf(dealPriceMin)) * 100);
+					}
+
 					pyeongList.add(ComplexPyeongVO.builder()
 						.pyeongName(pyeong.getPyeongName())
 						.pyeongName2(pyeong.getPyeongName2())
-						.dealPriceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getDealPriceMin() != null
-							? pyeong.getArticleStatistics().getDealPriceMin() : "0")
+						.dealPriceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getDealPriceMin() != null ?
+							pyeong.getArticleStatistics().getDealPriceMin() : "0")
 						.dealPricePerSpaceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getDealPricePerSpaceMin() != null ?
 							pyeong.getArticleStatistics().getDealPricePerSpaceMin() : "0")
 						.leasePriceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePriceMin() != null ?
 							pyeong.getArticleStatistics().getLeasePriceMin() : "0")
 						.leasePricePerSpaceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePricePerSpaceMin() != null ?
 							pyeong.getArticleStatistics().getLeasePricePerSpaceMin() : "0")
-						.leasePriceRateMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePriceRateMin() != null ?
-							pyeong.getArticleStatistics().getLeasePriceRateMin() : "0")
+						.leasePriceRateMin(leasePriceRate)
 						.landPriceMaxByPtp(pyeong.getLandPriceMaxByPtp() != null && pyeong.getLandPriceMaxByPtp().getMaxPrice() != null ?
 							pyeong.getLandPriceMaxByPtp().getMaxPrice() : "0")
 						.build());
