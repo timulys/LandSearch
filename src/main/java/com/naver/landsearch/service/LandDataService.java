@@ -174,12 +174,16 @@ public class LandDataService {
 					if (pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getDealPriceMin() != null) {
 						dealPriceMin = pyeong.getArticleStatistics().getDealPriceMin();
 						if (dealPriceMin.contains(" ")) {
-							dealPriceMin = dealPriceMin.replaceAll("억 ", "").replace(",", "");
+							if (dealPriceMin.replaceAll("억 ", "").length() < 5) {
+								dealPriceMin = dealPriceMin.replaceAll("억 ", "0").replace(",", "");
+							} else {
+								dealPriceMin = dealPriceMin.replaceAll("억 ", "").replace(",", "");
+							}
 						} else {
 							if (dealPriceMin.contains(","))
 								dealPriceMin = dealPriceMin.replaceAll(",", "");
 							else
-							dealPriceMin = dealPriceMin.replaceAll("억", "0000");
+								dealPriceMin = dealPriceMin.replaceAll("억", "0000");
 						}
 					}
 
@@ -187,7 +191,11 @@ public class LandDataService {
 					if (pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePriceMin() != null) {
 						leasePriceMin = pyeong.getArticleStatistics().getLeasePriceMin();
 						if (leasePriceMin.contains(" ")) {
-							leasePriceMin = leasePriceMin.replaceAll("억 ", "").replace(",", "");
+							if (leasePriceMin.replaceAll("억 ", "").length() < 5) {
+								leasePriceMin = leasePriceMin.replaceAll("억 ", "0").replace(",", "");
+							} else {
+								leasePriceMin = leasePriceMin.replaceAll("억 ", "").replace(",", "");
+							}
 						} else {
 							if (leasePriceMin.contains(","))
 								leasePriceMin = leasePriceMin.replaceAll(",", "");
