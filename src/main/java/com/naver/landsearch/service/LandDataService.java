@@ -205,8 +205,10 @@ public class LandDataService {
 					}
 
 					String leasePriceRate = "0";
+					Integer gapPrice = 0;
 					if (!"0".equals(dealPriceMin)) {
 						leasePriceRate = String.format("%.2f", (Double.valueOf(leasePriceMin) / Double.valueOf(dealPriceMin)) * 100);
+						gapPrice = Integer.parseInt(dealPriceMin) - Integer.parseInt(leasePriceMin);
 					}
 
 					pyeongList.add(ComplexPyeongVO.builder()
@@ -221,6 +223,7 @@ public class LandDataService {
 						.leasePricePerSpaceMin(pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePricePerSpaceMin() != null ?
 							pyeong.getArticleStatistics().getLeasePricePerSpaceMin() : "0")
 						.leasePriceRateMin(leasePriceRate)
+						.gapPrice(gapPrice)
 						.landPriceMaxByPtp(pyeong.getLandPriceMaxByPtp() != null && pyeong.getLandPriceMaxByPtp().getMaxPrice() != null ?
 							pyeong.getLandPriceMaxByPtp().getMaxPrice() : "0")
 						.build());
