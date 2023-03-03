@@ -64,7 +64,13 @@ function renderTemplate(data) {
                 var entrance = "";
                 pyeong.entranceType == "계단식" ? entrance = "계" : entrance = "복";
 
-                template += "<span style='font-weight: bold; color: red;'>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
+                if (pyeong.gapPrice > 3000 && pyeong.gapPrice < 5000) {
+                    template += "<span style='font-weight: bold; color: red;'>:: [★]" +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
+                } else if (pyeong.gapPrice < 3000) {
+                    template += "<span style='font-weight: bold; color: red;'>:: [★★★]" +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
+                } else {
+                    template += "<span style='font-weight: bold; color: red;'>:: " + pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
+                }
                 template += "<span style='font-weight: bold; color: red; font-size: 6px'>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
                     pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ") : " + pyeong.gapPrice + "만 (" + pyeong.leasePriceRateMin + ")]</span>";
             } else {
