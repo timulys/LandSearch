@@ -37,4 +37,6 @@ public class ComplexPyeongVO {
 	private Integer gapPrice;
 	// 최고 공시가격
 	private String landPriceMaxByPtp;
+	// 현관 타입
+	private String entranceType;
 }

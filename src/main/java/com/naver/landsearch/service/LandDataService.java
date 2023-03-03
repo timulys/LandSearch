@@ -226,6 +226,7 @@ public class LandDataService {
 						.gapPrice(gapPrice)
 						.landPriceMaxByPtp(pyeong.getLandPriceMaxByPtp() != null && pyeong.getLandPriceMaxByPtp().getMaxPrice() != null ?
 							pyeong.getLandPriceMaxByPtp().getMaxPrice() : "0")
+						.entranceType(pyeong.getEntranceType())
 						.build());
 				});
 			}

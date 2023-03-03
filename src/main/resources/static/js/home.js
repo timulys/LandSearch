@@ -60,8 +60,11 @@ function renderTemplate(data) {
         template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='H'/>";
         template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='U'/>";
         item.complexPyeongVOList.forEach(function(pyeong) {
-            if (pyeong.leasePriceRateMin * 1 >= 70) {
-                template += "<span style='font-weight: bold; color: red;'>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + ")</span>";
+            if (pyeong.leasePriceRateMin * 1 >= 70 || (pyeong.gapPrice < 5000 && pyeong.gapPrice > 0)) {
+                var entrance = "";
+                pyeong.entranceType == "계단식" ? entrance = "계" : entrance = "복";
+
+                template += "<span style='font-weight: bold; color: red;'>:: " +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
                 template += "<span style='font-weight: bold; color: red; font-size: 6px'>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
                     pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ") : " + pyeong.gapPrice + "만 (" + pyeong.leasePriceRateMin + ")]</span>";
             } else {
