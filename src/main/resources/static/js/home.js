@@ -64,9 +64,9 @@ function renderTemplate(data) {
                 var entrance = "";
                 pyeong.entranceType == "계단식" ? entrance = "계" : entrance = "복";
 
-                if (pyeong.gapPrice > 3000 && pyeong.gapPrice < 5000) {
+                if (pyeong.gapPrice > 3000 && pyeong.gapPrice <= 5000) {
                     template += "<span style='font-weight: bold; color: red;'>:: [★]" +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
-                } else if (pyeong.gapPrice < 3000) {
+                } else if (pyeong.gapPrice <= 3000) {
                     template += "<span style='font-weight: bold; color: red;'>:: [★★★]" +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
                 } else {
                     template += "<span style='font-weight: bold; color: red;'>:: " + pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
