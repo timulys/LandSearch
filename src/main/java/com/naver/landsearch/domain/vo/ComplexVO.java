@@ -40,7 +40,8 @@ public class ComplexVO {
 	private String dealPriceMin;
 	// 전세 최저 금액
 	private String leasePriceMin;
-
+	// 사용승인일
+	private String useApproveYmd;
 	// 실거래가 최근 매매 금액
 	private String realDealPrice;
 	// 실거래가 최근 매매 년도
@@ -64,4 +65,7 @@ public class ComplexVO {
 
 	// 단지 평형별 기본 데이터 목록
 	private List<ComplexPyeongVO> complexPyeongVOList;
+
+	// 추천 단지 목록
+	private List<RecommendVO> recommendList;
 }

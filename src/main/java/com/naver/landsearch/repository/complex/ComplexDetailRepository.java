@@ -19,4 +19,5 @@ import java.util.List;
  */
 @Repository
 public interface ComplexDetailRepository extends JpaRepository<ComplexDetail, String> {
+	List<ComplexDetail> findAllByAddress1OrderByAddressAscAddress2AscAddress3AscComplexNameAsc(String address1);
 }

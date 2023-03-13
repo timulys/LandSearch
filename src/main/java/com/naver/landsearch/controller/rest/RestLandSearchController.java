@@ -6,7 +6,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.naver.landsearch.domain.complex.ComplexDetail;
 import com.naver.landsearch.domain.vo.ArticleVO;
 import com.naver.landsearch.domain.vo.ComplexVO;
+import com.naver.landsearch.domain.vo.RecommendVO;
 import com.naver.landsearch.service.LandDataService;
+import com.naver.landsearch.service.TelegramService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,7 @@ import java.util.Map;
 public class RestLandSearchController {
 	// Autowired
 	public final LandDataService landDataService;
+	public final TelegramService telegramService;
 
 	@GetMapping("/codeSync")
 	public ResponseEntity registerByCsv() {
@@ -59,8 +62,23 @@ public class RestLandSearchController {
 	@GetMapping("/allData")
 	public ResponseEntity<Map<String, Object>> allSelectComplexInfo() {
 		// 등록된 전체 Complex 목록 조회
+		landDataService.clearRecommendList();
 		List<ComplexVO> complexVOList = landDataService.selectAllLandDataVO();
 		
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", complexVOList);
+		if (complexVOList != null) {
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity(HttpStatus.NO_CONTENT);
+	}
+
+	@GetMapping("/allDataByAddress")
+	public ResponseEntity<Map<String, Object>> allSelectComplexInfoByAddress(@RequestParam("address1") String address1) {
+		// 지역별 Complex 목록 조회(시/도 단위)
+		landDataService.clearRecommendList();
+		List<ComplexVO> complexVOList = landDataService.selectAllLandDataByAddress1(address1);
+
 		Map<String, Object> result = new HashMap<>();
 		result.put("complexs", complexVOList);
 		if (complexVOList != null) {
@@ -94,5 +112,29 @@ public class RestLandSearchController {
 		}
 		System.out.println("=============== 업데이트 완료 : " + System.currentTimeMillis() + "===============");
 		return ResponseEntity.ok().body(Boolean.TRUE);
+	}
+
+	@GetMapping("/updateByAddress")
+	public ResponseEntity<Boolean> updateByAddress(@RequestParam("address1") String address1) {
+		List<String> complexCodeList = landDataService.selectAllComplexCodeByAddress(address1);
+		System.out.println("=============== " + address1 + " 업데이트 시작 : " + System.currentTimeMillis() + "===============");
+		for (int i = 0; i < complexCodeList.size(); i++) {
+			System.out.println("=============== " + (complexCodeList.size() + 1) + " 중 " + (i + 1) + " 번째 단지 업데이트 시작 ===============");
+			landDataService.saveLandData(complexCodeList.get(i));
+		}
+		System.out.println("=============== " + address1 + " 업데이트 완료 : " + System.currentTimeMillis() + "===============");
+		return ResponseEntity.ok().body(Boolean.TRUE);
+	}
+
+	@GetMapping("/recommend")
+	public ResponseEntity<Map<String, Object>> recommendComplexList() {
+		List<RecommendVO> recommendList = landDataService.getRecommendList();
+		Map<String, Object> result = new HashMap<>();
+		result.put("recommendList", recommendList);
+		if (recommendList != null) {
+			telegramService.funcTelegram(recommendList);
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
 }
