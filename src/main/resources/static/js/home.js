@@ -18,10 +18,13 @@ function dataSelectAll() {
     })
 }
 
-function dataAddress(address1) {
-    var url = origin + "allDataByAddress";
+function dataAddress() {
+    var url = origin + "selectByAddress";
     var param = {
-        address1 : address1
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val()
     };
     $.ajax({
         url: url,
@@ -30,6 +33,17 @@ function dataAddress(address1) {
     }).done((data) => {
         $("#dataContent").empty();
         $("#dataContent").append(renderTemplate(data));
+    })
+}
+
+function dataSync() {
+    var url = origin + "codeSync";
+    $.ajax({
+        url: url,
+        type: "GET"
+    }).done((data) => {
+        $("#dataContent").empty();
+        $("#dataContent").append(data.resultMsg);
     })
 }
 
@@ -48,15 +62,28 @@ function dataUpdateAll() {
     }
 }
 
-function dataUpdateAllByAddress(address1) {
-    if (confirm(address1 + " 지역 업데이트를 시작합니다. 정말 업데이트 하시겠습니까?")) {
-        var url = origin + "updateByAddress";
-        var param = {
-            address1 : address1
-        };
+function dataUpdateAllByAddress() {
+    var address1 = $("#address1").val();
+    var region = address1;
+    var address2 = $("#address2").val();
+    region += address2 != null ? address2 : "";
+    var address3 = $("#address3").val();
+    region += address3 != null ? address3 : "";
+    var address4 = $("#address4").val();
+    region += address4 != null ? address4 : "";
+
+    var url = origin + "updateByAddress";
+    var param = {
+        address1 : address1,
+        address2 : address2,
+        address3 : address3,
+        address4 : address4
+    };
+    if (confirm(region + " 업데이트를 시작합니다. 정말 업데이트 하시겠습니까?")) {
         $.ajax({
             url: url,
-            type: "GET",
+            type: "POST",
+            dataType: "json",
             data: param
         }).done((data) => {
             console.log(data);
@@ -69,8 +96,16 @@ function dataUpdateAllByAddress(address1) {
 
 function dataRecommend() {
     var url = origin + "recommend";
+    var param = {
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val()
+    };
     $.ajax({
         url: url,
+        data: param,
+        dataType: "json",
         type: "GET"
     }).done((data) => {
         $("#dialog").empty();
@@ -207,3 +242,108 @@ function dataSelectByCode(code) {
         });
     })
 }
+
+function dataSearchPrice() {
+    var url = origin + "getByPrice";
+    var param = {
+        dealPrice : $("#dealPrice").val()
+    };
+    $.ajax({
+        url: url,
+        data: param,
+        type: "GET",
+    }).done((data) => {
+        var template = "";
+        $("#dataContent").empty();
+
+        data.complexs.forEach(function(item, index) {
+            template += "<div>"
+            if (item.gapPrice <= 5000) {
+                template += "<span style='font-weight: bold; color: red'>[" + (index+1) +  "." + item.address + "]" + item.complexName + "(" + item.useApproveYear + ")</span>";
+            } else {
+                template += "<span style='font-weight: bold'>[" + (index + 1) + "." + item.address + "]" + item.complexName + "(" + item.useApproveYear + ")</span>";
+            }
+            template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
+            template += "<span>(업데이트 일시 : " + item.updateAt + ")</span>"
+            template += "<span> - " + item.pyeongName + "(" + item.pyeongName2 + ")[" + item.entranceType + "]</span>";
+            template += "<span>  : " + item.dealPriceMin + " (실 : " + item.realDealPrice + ") / " +
+                item.leasePriceMin + "(실 : " + item.realLeasePrice + ")]</span>";
+            if (item.gapPrice <= 5000) {
+                template += "<span style='font-weight: bold; color: red'> 갭 가격 : " + item.gapPrice + "</span>";
+            } else {
+                template += "<span> 갭 가격 : " + item.gapPrice + "</span>";
+            }
+        });
+        $("#dataContent").append(template);
+    });
+}
+
+$(function() {
+    var url = origin + "getAddress";
+
+    $("#address1").change(function() {
+        $("#address2").empty();
+        $("#address3").empty();
+        $("#address4").empty();
+        var addressDTO = {
+            address1 : $("#address1").val()
+        };
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            data: addressDTO,
+            type: "POST"
+        }).done((data) => {
+            if (data.address2 != null) {
+                $("#address2").append("<option value=''>전체</option>")
+                for (let i = 0; i < data.address2.length; i++) {
+                    $("#address2").append("<option value='" + data.address2[i] + "'>" + data.address2[i] + "</option>")
+                }
+            }
+        })
+    });
+
+    $("#address2").change(function() {
+        $("#address3").empty();
+        $("#address4").empty();
+        var addressDTO = {
+            address1 : $("#address1").val(),
+            address2 : $("#address2").val()
+        };
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            data: addressDTO,
+            type: "POST"
+        }).done((data) => {
+            if (data.address3 != null) {
+                $("#address3").append("<option value=''>전체</option>")
+                for (let i = 0; i < data.address3.length; i++) {
+                    $("#address3").append("<option value='" + data.address3[i] + "'>" + data.address3[i] + "</option>")
+                }
+            }
+        })
+    });
+
+    $("#address3").change(function() {
+        $("#address4").empty();
+        var addressDTO = {
+            address1 : $("#address1").val(),
+            address2 : $("#address2").val(),
+            address3 : $("#address3").val()
+        };
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            data: addressDTO,
+            type: "POST"
+        }).done((data) => {
+            if (data.address4 != null && data.address4[0] != null) {
+                $("#address4").append("<option value=''>전체</option>")
+                for (let i = 0; i < data.address4.length; i++) {
+                    $("#address4").append("<option value='" + data.address4[i] + "'>" + data.address4[i] + "</option>")
+                }
+            }
+        })
+    });
+})

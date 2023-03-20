@@ -3,6 +3,8 @@ package com.naver.landsearch.domain.vo;
 import com.naver.landsearch.domain.complex.ComplexPyeongDetail;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -32,8 +34,10 @@ public class ComplexVO {
 	private String address;
 	// 제곱미터 평형 면적
 	private String supplyArea;
-	// 평 타입 이름
+	// 평 타입 이름(제곱미터형)
 	private String pyeongName;
+	// 평 타입 이름(평형)
+	private String pyeongName2;
 	// 평당가
 	private String spacePrice;
 	// 매매 최저 금액

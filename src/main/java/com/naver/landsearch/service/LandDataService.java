@@ -7,16 +7,11 @@ import com.naver.landsearch.domain.price.ArticleStatistics;
 import com.naver.landsearch.domain.price.ComplexRealPrice;
 import com.naver.landsearch.domain.realprice.Price;
 import com.naver.landsearch.domain.realprice.RealPrice;
-import com.naver.landsearch.domain.vo.ArticleVO;
-import com.naver.landsearch.domain.vo.ComplexPyeongVO;
-import com.naver.landsearch.domain.vo.ComplexVO;
-import com.naver.landsearch.domain.vo.RecommendVO;
+import com.naver.landsearch.domain.vo.*;
+import com.naver.landsearch.dto.AddressDTO;
 import com.naver.landsearch.dto.LandDataDTO;
 import com.naver.landsearch.repository.complex.ComplexDetailRepository;
 import com.naver.landsearch.repository.complex.ComplexPyeongDetailRepository;
-import com.naver.landsearch.repository.price.ArticleStatisticsRepository;
-import com.naver.landsearch.repository.price.ComplexRealPriceRepository;
-import com.naver.landsearch.repository.price.LandPriceMaxByPtpRepository;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -31,7 +26,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -66,23 +63,36 @@ public class LandDataService {
 	private final ComplexDetailRepository complexDetailRepository;
 	private final ComplexPyeongDetailRepository complexPyeongDetailRepository;
 
-	private final ArticleStatisticsRepository articleStatisticsRepository;
-	private final LandPriceMaxByPtpRepository landPriceMaxByPtpRepository;
-
-	private final ComplexRealPriceRepository complexRealPriceRepository;
-
 	// Service methods
 	public List<String> selectAllComplexCode() {
 		return complexDetailRepository.findAll().stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
 	}
 
-	public List<String> selectAllComplexCodeByAddress(String address1) {
-		return complexDetailRepository.findAllByAddress1OrderByAddressAscAddress2AscAddress3AscComplexNameAsc(address1)
+	public List<String> selectAllComplexCodeByAddress(AddressDTO addressDTO) {
+		if (addressDTO.getAddress4() != null && !addressDTO.getAddress4().isEmpty()) {
+			return complexDetailRepository
+				.findAllByAddress1AndAddress2AndAddress3AndAddress4OrderByAddressAscAddress2AscAddress3AscAddress4AscComplexNameAsc
+					(addressDTO.getAddress1(), addressDTO.getAddress2(), addressDTO.getAddress3(), addressDTO.getAddress4())
+				.stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
+		} else if (addressDTO.getAddress3() != null && !addressDTO.getAddress3().isEmpty()) {
+			return complexDetailRepository
+				.findAllByAddress1AndAddress2AndAddress3OrderByAddressAscAddress2AscAddress3AscComplexNameAsc
+					(addressDTO.getAddress1(), addressDTO.getAddress2(), addressDTO.getAddress3())
+				.stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
+		} else if (addressDTO.getAddress2() != null && !addressDTO.getAddress2().isEmpty()) {
+			return complexDetailRepository
+				.findAllByAddress1AndAddress2OrderByAddressAscAddress2AscAddress3AscComplexNameAsc
+					(addressDTO.getAddress1(), addressDTO.getAddress2())
+				.stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
+		}
+		return complexDetailRepository
+			.findAllByAddress1OrderByAddressAscAddress2AscAddress3AscComplexNameAsc(addressDTO.getAddress1())
 			.stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
 	}
 
-	public void codeSyncByCsv() {
+	public String codeSyncByCsv() {
 		// Complex Code Sync by CSV
+		String result = "";
 		List<String> codeList = new ArrayList<>();
 		BufferedReader reader = null;
 		try {
@@ -96,14 +106,17 @@ public class LandDataService {
 					i++;
 					System.out.println(i + " 번째 단지 : " + code);
 					saveLandData(code);
+					result += code + " - 업데이트" + "</br>";
 				} else {
 					System.out.println(code + " - 있음");
+					result += code + " - 있음" + "</br>";
 				}
 			}
 			System.out.println("코드 입력 완료");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return result;
 	}
 
 	public ComplexVO saveLandData(String complexCode) {
@@ -157,13 +170,67 @@ public class LandDataService {
 
 	public List<ComplexVO> selectAllLandDataVO() {
 		// UI 표현 가능하도록 변경
-		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll(Sort.by(Sort.Direction.ASC, "address", "address2", "address3", "complexName"));
+		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll(Sort.by(Sort.Direction.ASC, "address", "address2", "address3", "complex" +
+			"Name"));
 		return selectComplex(complexDetailList);
 	}
 
-	public List<ComplexVO> selectAllLandDataByAddress1(String address1) {
-		List<ComplexDetail> complexDetailList = complexDetailRepository.findAllByAddress1OrderByAddressAscAddress2AscAddress3AscComplexNameAsc(address1);
+	public List<ComplexVO> selectAllLandDataByAddress(String address1, String address2, String address3, String address4) {
+		List<ComplexDetail> complexDetailList = null;
+		if (address4 != null && !address4.isEmpty()) {
+			complexDetailList = complexDetailRepository.findAllByAddress1AndAddress2AndAddress3AndAddress4OrderByAddressAscAddress2AscAddress3AscAddress4AscComplexNameAsc(address1, address2, address3, address4);
+		} else if (address3 != null && !address3.isEmpty()) {
+			complexDetailList = complexDetailRepository.findAllByAddress1AndAddress2AndAddress3OrderByAddressAscAddress2AscAddress3AscComplexNameAsc(address1, address2, address3);
+		} else if (address2 != null && !address2.isEmpty()) {
+			complexDetailList = complexDetailRepository.findAllByAddress1AndAddress2OrderByAddressAscAddress2AscAddress3AscComplexNameAsc(address1, address2);
+		} else {
+			complexDetailList = complexDetailRepository.findAllByAddress1OrderByAddressAscAddress2AscAddress3AscComplexNameAsc(address1);
+		}
 		return selectComplex(complexDetailList);
+	}
+
+	public List<PriceComplexVO> selectAllLandDataByPrice(String dealPrice) {
+		List<PriceComplexVO> complexDetailList = complexDetailRepository.findByDealPrice(dealPrice + "억%");
+
+		complexDetailList.stream().forEach(i -> {
+			String dealPriceMin = "0";
+			String leasePriceMin = "0";
+			if (i.getDealPriceMin() != null) {
+				if (i.getDealPriceMin().contains(" ")) {
+					if (i.getDealPriceMin().split("억")[0].length() > 1 || i.getDealPriceMin().replaceAll("억 ", "").length() < 5) {
+						dealPriceMin = i.getDealPriceMin().replaceAll("억 ", "0").replace(",", "");
+					} else {
+						dealPriceMin = i.getDealPriceMin().replaceAll("억 ", "").replace(",", "");
+					}
+				} else {
+					if (i.getDealPriceMin().contains(","))
+						dealPriceMin = i.getDealPriceMin().replaceAll(",", "");
+					else
+						dealPriceMin = i.getDealPriceMin().replaceAll("억", "0000");
+				}
+			} else {
+				i.setDealPriceMin("0");
+			}
+			if (i.getLeasePriceMin() != null) {
+				if (i.getLeasePriceMin().contains(" ")) {
+					if (i.getLeasePriceMin().split("억")[0].length() > 1 || i.getLeasePriceMin().replaceAll("억 ", "").length() < 5) {
+						leasePriceMin = i.getLeasePriceMin().replaceAll("억 ", "0").replace(",", "");
+					} else {
+						leasePriceMin = i.getLeasePriceMin().replaceAll("억 ", "").replace(",", "");
+					}
+				} else {
+					if (i.getLeasePriceMin().contains(","))
+						leasePriceMin = i.getLeasePriceMin().replaceAll(",", "");
+					else
+						leasePriceMin = i.getLeasePriceMin().replaceAll("억", "0000");
+				}
+			} else {
+				i.setLeasePriceMin("0");
+			}
+			i.setGapPrice(Integer.parseInt(dealPriceMin) - Integer.parseInt(leasePriceMin));
+		});
+
+		return complexDetailList;
 	}
 
 	public List<ArticleVO> getLandData(String complexCode) {
@@ -183,27 +250,41 @@ public class LandDataService {
 						.dealCount(articleStatistics.getDealCount())
 						.leaseCount(articleStatistics.getLeaseCount())
 						.rentCount(articleStatistics.getRentCount())
-						.dealPriceMin(articleStatistics.getDealPriceMin())
-						.dealPricePerSpaceMin(articleStatistics.getDealPricePerSpaceMin())
-						.dealPriceMax(articleStatistics.getDealPriceMax())
-						.dealPricePerSpaceMax(articleStatistics.getDealPricePerSpaceMax())
-						.leasePriceMin(articleStatistics.getLeasePriceMin())
-						.leasePricePerSpaceMin(articleStatistics.getLeasePricePerSpaceMin())
-						.leasePriceMax(articleStatistics.getLeasePriceMax())
-						.leasePricePerSpaceMax(articleStatistics.getLeasePricePerSpaceMax())
-						.leasePriceRateMin(articleStatistics.getLeasePriceRateMin())
-						.leasePriceRateMax(articleStatistics.getLeasePriceRateMax())
-						.realDealPrice(complexPyeongDetail.getRealDealPrice().getFormattedPrice())
+						.dealPriceMin(articleStatistics.getDealPriceMin() != null ?
+							articleStatistics.getDealPriceMin() : "0")
+						.dealPricePerSpaceMin(articleStatistics.getDealPricePerSpaceMin() != null ?
+							articleStatistics.getDealPricePerSpaceMin() : "0")
+						.dealPriceMax(articleStatistics.getDealPriceMax() != null ?
+							articleStatistics.getDealPriceMax() : "0")
+						.dealPricePerSpaceMax(articleStatistics.getDealPricePerSpaceMax() != null ?
+							articleStatistics.getDealPricePerSpaceMax() : "0")
+						.leasePriceMin(articleStatistics.getLeasePriceMin() != null ?
+							articleStatistics.getLeasePriceMin() : "0")
+						.leasePricePerSpaceMin(articleStatistics.getLeasePricePerSpaceMin() != null ?
+							articleStatistics.getLeasePricePerSpaceMin() : "0")
+						.leasePriceMax(articleStatistics.getLeasePriceMax() != null ?
+							articleStatistics.getLeasePriceMax() : "0")
+						.leasePricePerSpaceMax(articleStatistics.getLeasePricePerSpaceMax() != null ?
+							articleStatistics.getLeasePricePerSpaceMax() : "0")
+						.leasePriceRateMin(articleStatistics.getLeasePriceRateMin() != null ?
+							articleStatistics.getLeasePriceRateMin() : "0")
+						.leasePriceRateMax(articleStatistics.getLeasePriceRateMax() != null ?
+							articleStatistics.getLeasePriceRateMax() : "0")
+						.realDealPrice(complexPyeongDetail.getRealDealPrice().getFormattedPrice() != null ?
+							complexPyeongDetail.getRealDealPrice().getFormattedPrice() : "0")
 						.realDealDate(
+							complexPyeongDetail.getRealDealPrice().getTradeYear() != null ?
 								complexPyeongDetail.getRealDealPrice().getTradeYear() + "/" +
 								complexPyeongDetail.getRealDealPrice().getTradeMonth() + "/" +
-								complexPyeongDetail.getRealDealPrice().getTradeDate()
+								complexPyeongDetail.getRealDealPrice().getTradeDate() : "0/0/0"
 						)
-						.realLeasePrice(complexPyeongDetail.getRealLeasePrice().getFormattedPrice())
+						.realLeasePrice(complexPyeongDetail.getRealLeasePrice().getFormattedPrice() != null ?
+							complexPyeongDetail.getRealLeasePrice().getFormattedPrice() : "0")
 						.realLeaseDate(
+							complexPyeongDetail.getRealLeasePrice().getTradeYear() != null ?
 								complexPyeongDetail.getRealLeasePrice().getTradeYear() + "/" +
 								complexPyeongDetail.getRealLeasePrice().getTradeMonth() + "/" +
-								complexPyeongDetail.getRealLeasePrice().getTradeDate()
+								complexPyeongDetail.getRealLeasePrice().getTradeDate() : "0/0/0"
 						)
 						.createdAt(articleStatistics.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 						.build()
@@ -219,6 +300,23 @@ public class LandDataService {
 
 	public List<RecommendVO> getRecommendList() {
 		return this.recommendList;
+	}
+
+	public Map<String, Object> getAddress(AddressDTO addressDTO) {
+		Map<String, Object> result = new HashMap<>();
+		List<String> address2 = complexDetailRepository.findAllByAddress2(addressDTO.getAddress1());
+		result.put("address2", address2);
+		if (addressDTO.getAddress2() != null) {
+			List<String> address3 = complexDetailRepository.findAllByAddress3(addressDTO.getAddress1(),
+				addressDTO.getAddress2());
+			result.put("address3", address3);
+		}
+		if (addressDTO.getAddress3() != null) {
+			List<String> address4 = complexDetailRepository.findAllByAddress4(addressDTO.getAddress1(),
+				addressDTO.getAddress2(), addressDTO.getAddress3());
+			result.put("address4", address4);
+		}
+		return result;
 	}
 
 	////////////////////// private methods //////////////////////
@@ -245,6 +343,8 @@ public class LandDataService {
 							else
 								dealPriceMin = dealPriceMin.replaceAll("억", "0000");
 						}
+					} else {
+						dealPriceMin = "0";
 					}
 
 					String leasePriceMin = "0";
@@ -262,6 +362,8 @@ public class LandDataService {
 							else
 								leasePriceMin = leasePriceMin.replaceAll("억", "0000");
 						}
+					} else {
+						leasePriceMin = "0";
 					}
 
 					String leasePriceRate = "0";
@@ -301,7 +403,7 @@ public class LandDataService {
 						.complexNo(complex.getComplexNo())
 						.complexName(complex.getComplexName())
 						.url(complex.getLandDataUrl())
-						.address(complex.getAddress2())
+						.address(complex.getAddress2() + " " + complex.getAddress3())
 						.complexPyeongVo(pyeong)
 						.value(1)
 						.build();
@@ -336,7 +438,7 @@ public class LandDataService {
 			Node body = doc.selectFirst("body").childNode(0);
 			RealPrice realPrice = new ObjectMapper().readValue(body.toString(), RealPrice.class);
 
-			if (realPrice.getRealPriceOnMonthList().size() > 0) {
+			if (realPrice.getRealPriceOnMonthList() != null && realPrice.getRealPriceOnMonthList().size() > 0) {
 				Price price = realPrice.getRealPriceOnMonthList().get(0).getRealPriceList().get(0);
 				return ComplexRealPrice.builder()
 						.areaNo(realPrice.getAreaNo())
@@ -344,7 +446,7 @@ public class LandDataService {
 						.tradeYear(price.getTradeYear())
 						.tradeMonth(price.getTradeMonth())
 						.tradeDate(price.getTradeDate())
-						.formattedPrice(price.getFormattedPrice())
+						.formattedPrice(price.getFormattedPrice() != null ? price.getFormattedPrice() : "없음")
 						.floor(price.getFloor())
 						.build();
 			}

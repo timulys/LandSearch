@@ -28,72 +28,67 @@
         &nbsp
         <input value="전체업데이트" type="button" onclick="dataUpdateAll()"/>
         &nbsp
-        <input value="전체추천매물" type="button" onclick="dataRecommend()"/>
+        <input value="코드동기화" type="button" onclick="dataSync()"/>
     </div>
     <div>
-        <input value="서울" type="button" onclick="dataAddress('서울시')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('서울시')"/>
+        <select name="address1" id="address1">
+            <option value="">선택</option>
+            <option value="서울시">서울</option>
+            <option value="경기도">경기</option>
+            <option value="인천시">인천</option>
+            <option value="대전시">대전</option>
+            <option value="대구시">대구</option>
+            <option value="광주시">광주</option>
+            <option value="부산시">부산</option>
+            <option value="울산시">울산</option>
+            <option value="세종시">세종</option>
+            <option value="강원도">강원</option>
+            <option value="경상북도">경북</option>
+            <option value="경상남도">경남</option>
+            <option value="전라북도">전북</option>
+            <option value="전라남도">전남</option>
+            <option value="충청북도">충북</option>
+            <option value="충청남도">충남</option>
+            <option value="제주도">제주</option>
+        </select>
+        <select name="address2" id="address2">
+            <!-- address1 선택 시 script로 처리 -->
+        </select>
+        <select name="address3" id="address3">
+            <!-- address2 선택 시 script로 처리 -->
+        </select>
+        <select name="address4" id="address4">
+            <!-- address2 선택 시 script로 처리 -->
+        </select>
+        <input value="조회" type="button" onclick="dataAddress()"/>
+        <input value="추천매물" type="button" onclick="dataRecommend()"/>
+        <input value="업데이트" type="button" onclick="dataUpdateAllByAddress()"/>
         &nbsp
-        <input value="경기" type="button" onclick="dataAddress('경기도')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('경기도')"/>
         &nbsp
-        <input value="인천" type="button" onclick="dataAddress('인천시')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('인천시')"/>
-        &nbsp
-        <input value="대전" type="button" onclick="dataAddress('대전시')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('대전시')"/>
-        &nbsp
-        <input value="세종" type="button" onclick="dataAddress('세종시')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('세종시')"/>
-        &nbsp
-        <input value="광주" type="button" onclick="dataAddress('광주시')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('광주시')"/>
-        &nbsp
-        <input value="부산" type="button" onclick="dataAddress('부산시')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('부산시')"/>
-        &nbsp
-        <input value="강원" type="button" onclick="dataAddress('강원도')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('강원도')"/>
-        &nbsp
-        <input value="경북" type="button" onclick="dataAddress('경상북도')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('경상북도')"/>
-        &nbsp
-        <input value="경남" type="button" onclick="dataAddress('경상남도')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('경상남도')"/>
-        &nbsp
-        <input value="전북" type="button" onclick="dataAddress('전라북도')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('전라북도')"/>
-        &nbsp
-        <input value="전남" type="button" onclick="dataAddress('전라남도')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('전라남도')"/>
-        &nbsp
-        <input value="충북" type="button" onclick="dataAddress('충청북도')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('충청북도')"/>
-        &nbsp
-        <input value="충남" type="button" onclick="dataAddress('충청남도')"/>
-        <input value="추천" type="button" onclick="dataRecommend()"/>
-        <input value="갱신" type="button" onclick="dataUpdateAllByAddress('충청남도')"/>
+        <span>호가금액대</span>
+        <select name="dealPrice" id="dealPrice">
+            <option value="">선택</option>
+            <option value="1">1억대</option>
+            <option value="2">2억대</option>
+            <option value="3">3억대</option>
+            <option value="4">4억대</option>
+            <option value="5">5억대</option>
+            <option value="6">6억대</option>
+            <option value="7">7억대</option>
+            <option value="8">8억대</option>
+            <option value="9">9억대</option>
+            <option value="10">10억대</option>
+            <option value="11">11억대</option>
+            <option value="12">12억대</option>
+            <option value="13">13억대</option>
+            <option value="14">14억대</option>
+            <option value="15">15억대</option>
+        </select>
+        <input value="조회" type="button" onclick="dataSearchPrice()"/>
     </div>
     <HR/>
     <div id="dataContent">
-        <!--<p id="result"></p>
-        <a id="link" target="_blank">[바로보기]</a>-->
     </div>
-
     <div id="dialog" style="font-size: 6px; width: max-content; height: max-content">
     </div>
 </body>
