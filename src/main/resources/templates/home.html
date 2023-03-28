@@ -19,15 +19,10 @@
 <!--<script src="webjars/jquery/3.6.0/jquery.js"></script>-->
     <div>
         <input id="complexCode" type="text" placeholder="아파트 코드 입력"/>
-        &nbsp
         <input value="전체조회" type="button" onclick="dataSelectAll()"/>
-        &nbsp
         <input value="단건히스토리" type="button" onclick="dataSelect()"/>
-        &nbsp
         <input value="단건등록하기" type="button" onclick="dataSend()"/>
-        &nbsp
         <input value="전체업데이트" type="button" onclick="dataUpdateAll()"/>
-        &nbsp
         <input value="코드동기화" type="button" onclick="dataSync()"/>
     </div>
     <div>
@@ -60,9 +55,31 @@
         <select name="address4" id="address4">
             <!-- address2 선택 시 script로 처리 -->
         </select>
+        <input type="checkbox" name="onlyStairs" id="onlyStairs"/><label for="onlyStairs">계단식만</label>
         <input value="조회" type="button" onclick="dataAddress()"/>
         <input value="추천매물" type="button" onclick="dataRecommend()"/>
         <input value="업데이트" type="button" onclick="dataUpdateAllByAddress()"/>
+        &nbsp
+        <span>전용</span>
+        <select name="pyeongRange" id="pyeongRange">
+            <option value="">선택</option>
+            <option value="0">10평미만</option>
+            <option value="10">10평대</option>
+            <option value="20">20평대</option>
+            <option value="30">30평대</option>
+            <option value="40">40평대</option>
+            <option value="50">50평대</option>
+            <option value="60">60평대</option>
+            <option value="70">70평대</option>
+            <option value="80">80평대</option>
+            <option value="90">90평대</option>
+            <option value="100">100평대</option>
+        </select>
+        <input value="호가조회" type="button" onclick="dataSearchByDealPyeongRange()"/>
+        <input value="실거래가조회" type="button" onclick="dataSearchByRealDealPyeongRange()"/>
+        &nbsp
+        <input value="매매평당가순" type="button" onclick="dataSelectByDealPricePerSpace()"/>
+        <input value="매매실거래가순" type="button" onclick="dataSelectByRealDealPrice()"/>
         &nbsp
         &nbsp
         <span>호가금액대</span>

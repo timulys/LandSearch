@@ -36,6 +36,81 @@ function dataAddress() {
     })
 }
 
+function dataSearchByDealPyeongRange() {
+    var param = {
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val(),
+        exPyeong : $("#pyeongRange").val()
+    };
+    renderByPrice(param, origin + "selectByDealPricePyeongRange")
+}
+
+function dataSearchByRealDealPyeongRange() {
+    var param = {
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val(),
+        exPyeong : $("#pyeongRange").val()
+    };
+    renderByPrice(param, origin + "selectByRealDealPricePyeongRange")
+}
+
+function dataSelectByDealPricePerSpace() {
+    var param = {
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val()
+    };
+    renderByPrice(param, origin + "selectByDealPricePerSpace");
+}
+
+function dataSelectByRealDealPrice() {
+    var param = {
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val()
+    };
+    renderByPrice(param, origin + "selectByRealDealPrice");
+}
+
+function renderByPrice(param, url) {
+    $.ajax({
+        url: url,
+        data: param,
+        type: "GET",
+    }).done((data) => {
+        var template = "";
+        $("#dataContent").empty();
+        data.complexs.forEach(function(item, index) {
+            if ($("#onlyStairs").prop('checked') && item.entranceType == "복도식") {
+                return;
+            }
+            template += "<div>"
+            if (item.gapPrice <= 5000) {
+                template += "<span style='font-weight: bold; color: red'>[" + (index+1) +  "." + item.address + "]" + item.complexName + "(" + item.useApproveYear + ")</span>";
+            } else {
+                template += "<span style='font-weight: bold'>[" + (index + 1) + "." + item.address + "]" + item.complexName + "(" + item.useApproveYear + ")</span>";
+            }
+            template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
+            template += "<span>(생성 일시 : " + item.createAt + ")</span>"
+            template += "<span> - " + item.pyeongName + "(" + item.pyeongName2 + ")[" + item.entranceType + "]</span>";
+            template += "<span>  : " + item.dealPriceMin + "(" + item.dealPricePerSpaceMin + ") (실 : " + item.realDealPrice + ") / " +
+                item.leasePriceMin + "(" + item.leasePricePerSpaceMin + ") (실 : " + item.realLeasePrice + ")]</span>";
+            if (item.gapPrice <= 5000) {
+                template += "<span style='font-weight: bold; color: red'> 갭 가격 : " + item.gapPrice + "</span>";
+            } else {
+                template += "<span> 갭 가격 : " + item.gapPrice + "</span>";
+            }
+        });
+        $("#dataContent").append(template);
+    });
+}
+
 function dataSync() {
     var url = origin + "codeSync";
     $.ajax({
@@ -145,9 +220,7 @@ function dataSendByCode(code) {
         type: "GET",
     }).done((data) => {
         var complexVO = data.complexVO;
-        // $("#dataContent").empty();
         $("#dataContent").append("<span style='font-weight: bold'>[" + complexVO.address + "]" + complexVO.complexName + "(" + complexVO.complexNo + ") 업데이트 완료</span></br>");
-        // $("#dataContent").append(renderTemplate(data));
     })
 }
 
@@ -163,8 +236,10 @@ function renderTemplate(data) {
         item.complexPyeongVOList.forEach(function(pyeong) {
             var entrance = "";
             pyeong.entranceType == "계단식" ? entrance = "계" : entrance = "복";
+            if ($("#onlyStairs").prop('checked') && entrance == "복") {
+                return;
+            }
             if (pyeong.leasePriceRateMin * 1 >= 70 || (pyeong.gapPrice <= 5000 && pyeong.gapPrice > 0)) {
-
                 if (pyeong.gapPrice > 3000 && pyeong.gapPrice <= 5000) {
                     template += "<span style='font-weight: bold; color: red;'>:: [★]" +  pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
                 } else if (pyeong.gapPrice <= 3000) {
@@ -264,7 +339,7 @@ function dataSearchPrice() {
                 template += "<span style='font-weight: bold'>[" + (index + 1) + "." + item.address + "]" + item.complexName + "(" + item.useApproveYear + ")</span>";
             }
             template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
-            template += "<span>(업데이트 일시 : " + item.updateAt + ")</span>"
+            template += "<span>(생성 일시 : " + item.createAt + ")</span>"
             template += "<span> - " + item.pyeongName + "(" + item.pyeongName2 + ")[" + item.entranceType + "]</span>";
             template += "<span>  : " + item.dealPriceMin + " (실 : " + item.realDealPrice + ") / " +
                 item.leasePriceMin + "(실 : " + item.realLeasePrice + ")]</span>";

@@ -8,10 +8,11 @@ import com.naver.landsearch.domain.price.ComplexRealPrice;
 import com.naver.landsearch.domain.realprice.Price;
 import com.naver.landsearch.domain.realprice.RealPrice;
 import com.naver.landsearch.domain.vo.*;
-import com.naver.landsearch.dto.AddressDTO;
+import com.naver.landsearch.dto.SearchDTO;
 import com.naver.landsearch.dto.LandDataDTO;
 import com.naver.landsearch.repository.complex.ComplexDetailRepository;
 import com.naver.landsearch.repository.complex.ComplexPyeongDetailRepository;
+import com.naver.landsearch.repository.complex.PriceComplexDetailRepository;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -25,10 +26,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -63,30 +61,32 @@ public class LandDataService {
 	private final ComplexDetailRepository complexDetailRepository;
 	private final ComplexPyeongDetailRepository complexPyeongDetailRepository;
 
+	private final PriceComplexDetailRepository priceComplexDetailRepository;
+
 	// Service methods
 	public List<String> selectAllComplexCode() {
 		return complexDetailRepository.findAll().stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
 	}
 
-	public List<String> selectAllComplexCodeByAddress(AddressDTO addressDTO) {
-		if (addressDTO.getAddress4() != null && !addressDTO.getAddress4().isEmpty()) {
+	public List<String> selectAllComplexCodeByAddress(SearchDTO searchDTO) {
+		if (searchDTO.getAddress4() != null && !searchDTO.getAddress4().isEmpty()) {
 			return complexDetailRepository
 				.findAllByAddress1AndAddress2AndAddress3AndAddress4OrderByAddressAscAddress2AscAddress3AscAddress4AscComplexNameAsc
-					(addressDTO.getAddress1(), addressDTO.getAddress2(), addressDTO.getAddress3(), addressDTO.getAddress4())
+					(searchDTO.getAddress1(), searchDTO.getAddress2(), searchDTO.getAddress3(), searchDTO.getAddress4())
 				.stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
-		} else if (addressDTO.getAddress3() != null && !addressDTO.getAddress3().isEmpty()) {
+		} else if (searchDTO.getAddress3() != null && !searchDTO.getAddress3().isEmpty()) {
 			return complexDetailRepository
 				.findAllByAddress1AndAddress2AndAddress3OrderByAddressAscAddress2AscAddress3AscComplexNameAsc
-					(addressDTO.getAddress1(), addressDTO.getAddress2(), addressDTO.getAddress3())
+					(searchDTO.getAddress1(), searchDTO.getAddress2(), searchDTO.getAddress3())
 				.stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
-		} else if (addressDTO.getAddress2() != null && !addressDTO.getAddress2().isEmpty()) {
+		} else if (searchDTO.getAddress2() != null && !searchDTO.getAddress2().isEmpty()) {
 			return complexDetailRepository
 				.findAllByAddress1AndAddress2OrderByAddressAscAddress2AscAddress3AscComplexNameAsc
-					(addressDTO.getAddress1(), addressDTO.getAddress2())
+					(searchDTO.getAddress1(), searchDTO.getAddress2())
 				.stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
 		}
 		return complexDetailRepository
-			.findAllByAddress1OrderByAddressAscAddress2AscAddress3AscComplexNameAsc(addressDTO.getAddress1())
+			.findAllByAddress1OrderByAddressAscAddress2AscAddress3AscComplexNameAsc(searchDTO.getAddress1())
 			.stream().map(ComplexDetail::getComplexNo).collect(Collectors.toList());
 	}
 
@@ -170,8 +170,8 @@ public class LandDataService {
 
 	public List<ComplexVO> selectAllLandDataVO() {
 		// UI 표현 가능하도록 변경
-		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll(Sort.by(Sort.Direction.ASC, "address", "address2", "address3", "complex" +
-			"Name"));
+		List<ComplexDetail> complexDetailList = complexDetailRepository.findAll(Sort.by(Sort.Direction.ASC,
+			"address", "address2", "address3", "complexName"));
 		return selectComplex(complexDetailList);
 	}
 
@@ -189,47 +189,50 @@ public class LandDataService {
 		return selectComplex(complexDetailList);
 	}
 
+	// 금액대별 목록 조회
 	public List<PriceComplexVO> selectAllLandDataByPrice(String dealPrice) {
-		List<PriceComplexVO> complexDetailList = complexDetailRepository.findByDealPrice(dealPrice + "억%");
+		List<PriceComplexVO> complexDetailList = priceComplexDetailRepository.findByDealPrice(dealPrice + "억%");
+		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(complexDetailList);
+		return new LinkedList<>(distinctMap.values());
+	}
 
-		complexDetailList.stream().forEach(i -> {
-			String dealPriceMin = "0";
-			String leasePriceMin = "0";
-			if (i.getDealPriceMin() != null) {
-				if (i.getDealPriceMin().contains(" ")) {
-					if (i.getDealPriceMin().split("억")[0].length() > 1 || i.getDealPriceMin().replaceAll("억 ", "").length() < 5) {
-						dealPriceMin = i.getDealPriceMin().replaceAll("억 ", "0").replace(",", "");
-					} else {
-						dealPriceMin = i.getDealPriceMin().replaceAll("억 ", "").replace(",", "");
-					}
-				} else {
-					if (i.getDealPriceMin().contains(","))
-						dealPriceMin = i.getDealPriceMin().replaceAll(",", "");
-					else
-						dealPriceMin = i.getDealPriceMin().replaceAll("억", "0000");
-				}
-			} else {
-				i.setDealPriceMin("0");
-			}
-			if (i.getLeasePriceMin() != null) {
-				if (i.getLeasePriceMin().contains(" ")) {
-					if (i.getLeasePriceMin().split("억")[0].length() > 1 || i.getLeasePriceMin().replaceAll("억 ", "").length() < 5) {
-						leasePriceMin = i.getLeasePriceMin().replaceAll("억 ", "0").replace(",", "");
-					} else {
-						leasePriceMin = i.getLeasePriceMin().replaceAll("억 ", "").replace(",", "");
-					}
-				} else {
-					if (i.getLeasePriceMin().contains(","))
-						leasePriceMin = i.getLeasePriceMin().replaceAll(",", "");
-					else
-						leasePriceMin = i.getLeasePriceMin().replaceAll("억", "0000");
-				}
-			} else {
-				i.setLeasePriceMin("0");
-			}
-			i.setGapPrice(Integer.parseInt(dealPriceMin) - Integer.parseInt(leasePriceMin));
-		});
+	// 평형대별 호가 금액 순 목록 조회
+	public List<PriceComplexVO> selectByDealPricePyeongRange(SearchDTO searchDTO) {
+		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddressAndPyeong(searchDTO);
+		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
+		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
+			.sorted(Comparator.comparing(PriceComplexVO::getDealPriceMinToInt).reversed())
+			.collect(Collectors.toList());
+		return complexDetailList;
+	}
 
+	// 평형대별 실거래가 금액 순 목록 조회
+	public List<PriceComplexVO> selectByRealDealPricePyeongRange(SearchDTO searchDTO) {
+		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findRealDealPricePerSpaceByAddressAndPyeong(searchDTO);
+		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
+		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
+			.sorted(Comparator.comparing(PriceComplexVO::getRealDealPriceToInt).reversed())
+			.collect(Collectors.toList());
+		return complexDetailList;
+	}
+
+	// 지역 주소별 호가 매매 평당가 내림차순 목록 조회
+	public List<PriceComplexVO> selectByDealPricePerSpace(SearchDTO searchDTO) {
+		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddress(searchDTO);
+		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
+		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
+			.sorted(Comparator.comparing(PriceComplexVO::getDealPricePerSpaceMinToInt).reversed())
+			.collect(Collectors.toList());
+		return complexDetailList;
+	}
+
+	// 지역 주소별 실거래 매매가 내림차순 목록 조회
+	public List<PriceComplexVO> selectByRealDealPrice(SearchDTO searchDTO) {
+		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findRealDealPriceMinByAddress(searchDTO);
+		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
+		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
+			.sorted(Comparator.comparing(PriceComplexVO::getRealDealPriceToInt).reversed())
+			.collect(Collectors.toList());
 		return complexDetailList;
 	}
 
@@ -302,18 +305,18 @@ public class LandDataService {
 		return this.recommendList;
 	}
 
-	public Map<String, Object> getAddress(AddressDTO addressDTO) {
+	public Map<String, Object> getAddress(SearchDTO searchDTO) {
 		Map<String, Object> result = new HashMap<>();
-		List<String> address2 = complexDetailRepository.findAllByAddress2(addressDTO.getAddress1());
+		List<String> address2 = complexDetailRepository.findAllByAddress2(searchDTO.getAddress1());
 		result.put("address2", address2);
-		if (addressDTO.getAddress2() != null) {
-			List<String> address3 = complexDetailRepository.findAllByAddress3(addressDTO.getAddress1(),
-				addressDTO.getAddress2());
+		if (searchDTO.getAddress2() != null) {
+			List<String> address3 = complexDetailRepository.findAllByAddress3(searchDTO.getAddress1(),
+				searchDTO.getAddress2());
 			result.put("address3", address3);
 		}
-		if (addressDTO.getAddress3() != null) {
-			List<String> address4 = complexDetailRepository.findAllByAddress4(addressDTO.getAddress1(),
-				addressDTO.getAddress2(), addressDTO.getAddress3());
+		if (searchDTO.getAddress3() != null) {
+			List<String> address4 = complexDetailRepository.findAllByAddress4(searchDTO.getAddress1(),
+				searchDTO.getAddress2(), searchDTO.getAddress3());
 			result.put("address4", address4);
 		}
 		return result;
@@ -332,13 +335,15 @@ public class LandDataService {
 					if (pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getDealPriceMin() != null) {
 						dealPriceMin = pyeong.getArticleStatistics().getDealPriceMin();
 						if (dealPriceMin.contains(" ")) {
-							if (dealPriceMin.split("억")[0].length() > 1 || dealPriceMin.replaceAll("억 ", "").length() < 5) {
+							if (dealPriceMin.split("억").length > 1 && dealPriceMin.replaceAll("억 ", "").length() < 5) {
 								dealPriceMin = dealPriceMin.replaceAll("억 ", "0").replace(",", "");
 							} else {
 								dealPriceMin = dealPriceMin.replaceAll("억 ", "").replace(",", "");
 							}
 						} else {
-							if (dealPriceMin.contains(","))
+							if (dealPriceMin.contains(",") && dealPriceMin.contains("억"))
+								dealPriceMin = dealPriceMin.replace(",", "").replace("억", "0000");
+							else if (dealPriceMin.contains(","))
 								dealPriceMin = dealPriceMin.replaceAll(",", "");
 							else
 								dealPriceMin = dealPriceMin.replaceAll("억", "0000");
@@ -351,13 +356,15 @@ public class LandDataService {
 					if (pyeong.getArticleStatistics() != null && pyeong.getArticleStatistics().getLeasePriceMin() != null) {
 						leasePriceMin = pyeong.getArticleStatistics().getLeasePriceMin();
 						if (leasePriceMin.contains(" ")) {
-							if (leasePriceMin.replaceAll("억 ", "").length() < 5) {
+							if (leasePriceMin.split("억").length > 1 && leasePriceMin.replaceAll("억 ", "").length() < 5) {
 								leasePriceMin = leasePriceMin.replaceAll("억 ", "0").replace(",", "");
 							} else {
 								leasePriceMin = leasePriceMin.replaceAll("억 ", "").replace(",", "");
 							}
 						} else {
-							if (leasePriceMin.contains(","))
+							if (leasePriceMin.contains(",") && leasePriceMin.contains("억"))
+								leasePriceMin = leasePriceMin.replace(",", "").replace("억", "0000");
+							else if (leasePriceMin.contains(","))
 								leasePriceMin = leasePriceMin.replaceAll(",", "");
 							else
 								leasePriceMin = leasePriceMin.replaceAll("억", "0000");
@@ -403,7 +410,7 @@ public class LandDataService {
 						.complexNo(complex.getComplexNo())
 						.complexName(complex.getComplexName())
 						.url(complex.getLandDataUrl())
-						.address(complex.getAddress2() + " " + complex.getAddress3())
+						.address(complex.getAddress())
 						.complexPyeongVo(pyeong)
 						.value(1)
 						.build();
@@ -454,5 +461,97 @@ public class LandDataService {
 			e.printStackTrace();
 		}
 		return new ComplexRealPrice();
+	}
+
+	private Map<String, PriceComplexVO> getPriceComplexList(List<PriceComplexVO> complexDetailList) {
+		// 중복 제거 및 생성 일자로 오름차순 정렬
+		Map<String, PriceComplexVO> distinctMap = new LinkedHashMap<>();
+		complexDetailList.forEach(i -> {
+			if (distinctMap.get(i.getComplexName() + i.getPyeongName()) != null) {
+				PriceComplexVO compareVO = distinctMap.get(i.getComplexName() + i.getPyeongName());
+				int compareValue = compareVO.compareTo(i);
+				if (compareValue <= 0) {
+					setPriceFormatted(i);
+					distinctMap.put(i.getComplexName() + i.getPyeongName(), i);
+				}
+			} else {
+				setPriceFormatted(i);
+				distinctMap.put(i.getComplexName() + i.getPyeongName(), i);
+			}
+		});
+		return distinctMap;
+	}
+
+	private void setPriceFormatted(PriceComplexVO i) {
+		String dealPriceMin = "0";
+		String leasePriceMin = "0";
+		if (i.getDealPriceMin() != null) {
+			if (i.getDealPriceMin().contains(" ")) {
+				if (i.getDealPriceMin().split("억").length > 1 && i.getDealPriceMin().replaceAll("억 ", "").length() < 5) {
+					dealPriceMin = i.getDealPriceMin().replaceAll("억 ", "0").replace(",", "");
+				} else {
+					dealPriceMin = i.getDealPriceMin().replaceAll("억 ", "").replace(",", "");
+				}
+			} else {
+				if (i.getDealPriceMin().contains(",") && i.getDealPriceMin().contains("억"))
+					dealPriceMin = i.getDealPriceMin().replace(",", "").replace("억", "0000");
+				else if (i.getDealPriceMin().contains(","))
+					dealPriceMin = i.getDealPriceMin().replaceAll(",", "");
+				else
+					dealPriceMin = i.getDealPriceMin().replaceAll("억", "0000");
+			}
+			i.setDealPriceMinToInt(Integer.parseInt(dealPriceMin));
+		} else {
+			i.setDealPriceMin("0");
+		}
+
+		if (i.getDealPricePerSpaceMin() != null) {
+			if (i.getDealPricePerSpaceMin().contains("억"))
+				i.setDealPricePerSpaceMinToInt(0);
+			else
+				i.setDealPricePerSpaceMinToInt(Integer.parseInt(i.getDealPricePerSpaceMin().replace(",", "")));
+		}
+
+		// 실거래가
+		if(i.getRealDealPrice() != null) {
+			if (i.getRealDealPrice().equals("없음")) {
+				i.setRealDealPriceToInt(0);
+			} else {
+				if (i.getRealDealPrice().contains(" ")) {
+					if (i.getRealDealPrice().split("억").length > 1 && i.getRealDealPrice().replaceAll("억 ", "").length() < 5) {
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll("억 ", "0").replace(",", "")));
+					} else {
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll("억 ", "").replace(",", "")));
+					}
+				} else {
+					if (i.getRealDealPrice().contains(",") && i.getRealDealPrice().contains("억"))
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replace(",", "").replace("억", "0000")));
+					else if (i.getRealDealPrice().contains(","))
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll(",", "")));
+					else
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll("억", "0000")));
+				}
+			}
+		}
+
+		if (i.getLeasePriceMin() != null) {
+			if (i.getLeasePriceMin().contains(" ")) {
+				if (i.getLeasePriceMin().split("억").length > 1 && i.getLeasePriceMin().replaceAll("억 ", "").length() < 5) {
+					leasePriceMin = i.getLeasePriceMin().replaceAll("억 ", "0").replace(",", "");
+				} else {
+					leasePriceMin = i.getLeasePriceMin().replaceAll("억 ", "").replace(",", "");
+				}
+			} else {
+				if (i.getLeasePriceMin().contains(",") && i.getLeasePriceMin().contains("억"))
+					leasePriceMin = i.getLeasePriceMin().replace(",", "").replace("억", "0000");
+				else if (i.getLeasePriceMin().contains(","))
+					leasePriceMin = i.getLeasePriceMin().replaceAll(",", "");
+				else
+					leasePriceMin = i.getLeasePriceMin().replaceAll("억", "0000");
+			}
+		} else {
+			i.setLeasePriceMin("0");
+		}
+		i.setGapPrice(Integer.parseInt(dealPriceMin) - Integer.parseInt(leasePriceMin));
 	}
 }

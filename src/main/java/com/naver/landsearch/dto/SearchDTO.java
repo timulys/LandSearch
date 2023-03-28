@@ -18,9 +18,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddressDTO {
+public class SearchDTO {
+	// 주소 검색 옵션
 	private String address1;
 	private String address2;
 	private String address3;
 	private String address4;
+
+	// 평형대 검색 옵션
+	private String exPyeong;
 }

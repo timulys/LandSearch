@@ -1,5 +1,6 @@
 package com.naver.landsearch.domain.vo;
 
+import com.querydsl.core.Tuple;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PriceComplexVO {
+public class PriceComplexVO implements Comparable<PriceComplexVO> {
 	// 단지 주소
 	private String address;
 	// 단지 명
@@ -35,21 +36,31 @@ public class PriceComplexVO {
 	private String pyeongName2;
 	// 매매 최저 금액
 	private String dealPriceMin;
+	// 매매 최저 금액(정렬용)
+	private Integer dealPriceMinToInt;
+	// 매매 최저 평당가
+	private String dealPricePerSpaceMin;
+	// 매매 최저 평당가(정렬용)
+	private Integer dealPricePerSpaceMinToInt;
 	// 실거래가 최근 매매 금액
 	private String realDealPrice;
+	// 실거래가 최근 매매 금액(정렬용)
+	private Integer realDealPriceToInt;
 	// 전세 최저 금액
 	private String leasePriceMin;
+	// 전세 최저 평당가
+	private String leasePricePerSpaceMin;
 	// 실거래가 최근 전세 금액
 	private String realLeasePrice;
 	// 업데이트 일시
-	private LocalDateTime updateAt;
+	private LocalDateTime createAt;
 	// 현관 타입
 	private String entranceType;
 
 	// 기본 사용 생성자
-	public PriceComplexVO(String address, String complexName, String landDataUrl, String useApproveYear,
-		  String pyeongName, String pyeongName2, String dealPriceMin, String realDealPrice, String leasePriceMin,
-		  String realLeasePrice, LocalDateTime updateAt, String entranceType) {
+	public PriceComplexVO(String address, String complexName, String landDataUrl, String useApproveYear, String pyeongName,
+		  String pyeongName2, String dealPriceMin, String dealPricePerSpaceMin, String realDealPrice, String leasePriceMin,
+		  String leasePricePerSpaceMin, String realLeasePrice, LocalDateTime createAt, String entranceType) {
 		this.address = address;
 		this.complexName = complexName;
 		this.landDataUrl = landDataUrl;
@@ -57,19 +68,32 @@ public class PriceComplexVO {
 		this.pyeongName = pyeongName;
 		this.pyeongName2 = pyeongName2;
 		this.dealPriceMin = dealPriceMin;
+		if (dealPricePerSpaceMin != null)
+			this.dealPricePerSpaceMin = dealPricePerSpaceMin;
+		else
+			this.dealPricePerSpaceMin = "0";
 		if (realDealPrice != null)
 			this.realDealPrice = realDealPrice;
 		else
 			this.realDealPrice = "없음";
 		this.leasePriceMin = leasePriceMin;
+		if (leasePricePerSpaceMin != null)
+			this.leasePricePerSpaceMin = leasePricePerSpaceMin;
+		else
+			this.leasePricePerSpaceMin = "0";
 		if (realLeasePrice != null)
 			this.realLeasePrice = realLeasePrice;
 		else
 			this.realLeasePrice = "없음";
-		this.updateAt = updateAt;
+		this.createAt = createAt;
 		this.entranceType = entranceType;
 	}
 
 	// 갭 가격
 	private Integer gapPrice;
+
+	@Override
+	public int compareTo(PriceComplexVO o) {
+		return this.createAt.compareTo(o.createAt);
+	}
 }

@@ -1,7 +1,7 @@
 package com.naver.landsearch.service;
 
 import com.naver.landsearch.domain.vo.RecommendVO;
-import com.naver.landsearch.dto.AddressDTO;
+import com.naver.landsearch.dto.SearchDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +30,9 @@ public class TelegramService {
 	private static final String TOKEN = "6267327734:AAH_9ygjsgbNuyrmbg8BcJaeCB6RMdWRzdo";
 	private static final String CHAT_ID = "-1001793716640";
 
-	public void funcTelegram(AddressDTO addressDTO, List<RecommendVO> recommendList) {
-		String article = addressDTO.getAddress1() + addressDTO.getAddress2() +
-			addressDTO.getAddress3() + addressDTO.getAddress4() + "%0A%0A";
+	public void funcTelegram(SearchDTO searchDTO, List<RecommendVO> recommendList) {
+		String article = searchDTO.getAddress1() + searchDTO.getAddress2() +
+			searchDTO.getAddress3() + searchDTO.getAddress4() + "%0A%0A";
 		for (int i = 0; i < recommendList.size(); i++) {
 			if (recommendList.get(i).getValue() == 2) {
 				article += "★ ";

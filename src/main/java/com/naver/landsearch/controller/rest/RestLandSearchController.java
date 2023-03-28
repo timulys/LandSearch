@@ -4,7 +4,7 @@ import com.naver.landsearch.domain.vo.ArticleVO;
 import com.naver.landsearch.domain.vo.ComplexVO;
 import com.naver.landsearch.domain.vo.PriceComplexVO;
 import com.naver.landsearch.domain.vo.RecommendVO;
-import com.naver.landsearch.dto.AddressDTO;
+import com.naver.landsearch.dto.SearchDTO;
 import com.naver.landsearch.service.LandDataService;
 import com.naver.landsearch.service.TelegramService;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +72,7 @@ public class RestLandSearchController {
 
 	@GetMapping("/selectByAddress")
 	public ResponseEntity<Map<String, Object>> allSelectComplexInfoByAddress(@RequestParam("address1") String address1,
-		 @RequestParam("address2") String address2, @RequestParam("address3") String address3, @RequestParam("address4") String address4) {
+		@RequestParam("address2") String address2, @RequestParam("address3") String address3, @RequestParam("address4") String address4) {
 		// 지역별 Complex 목록 조회(시/도 단위)
 		landDataService.clearRecommendList();
 		List<ComplexVO> complexVOList = landDataService.selectAllLandDataByAddress(address1, address2, address3, address4);
@@ -80,6 +80,59 @@ public class RestLandSearchController {
 		Map<String, Object> result = new HashMap<>();
 		result.put("complexs", complexVOList);
 		if (complexVOList != null) {
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity(HttpStatus.NO_CONTENT);
+	}
+
+	@GetMapping("/selectByDealPricePyeongRange")
+	public ResponseEntity<Map<String, Object>> selectByDealPricePyeongRange(SearchDTO searchDTO) {
+		landDataService.clearRecommendList();
+		List<PriceComplexVO> priceComplexVOList = landDataService.selectByDealPricePyeongRange(searchDTO);
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", priceComplexVOList);
+
+		if (result != null) {
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity(HttpStatus.NO_CONTENT);
+	}
+
+	@GetMapping("/selectByRealDealPricePyeongRange")
+	public ResponseEntity<Map<String, Object>> selectByRealDealPricePyeongRange(SearchDTO searchDTO) {
+		landDataService.clearRecommendList();
+		List<PriceComplexVO> priceComplexVOList = landDataService.selectByRealDealPricePyeongRange(searchDTO);
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", priceComplexVOList);
+
+		if (result != null) {
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity(HttpStatus.NO_CONTENT);
+	}
+
+	@GetMapping("/selectByDealPricePerSpace")
+	public ResponseEntity<Map<String, Object>> selectByDealPricePerSpace(SearchDTO searchDTO) {
+		// 지역별 호가 매매 평당가 기준으로 정렬하여 조회
+		landDataService.clearRecommendList();
+		List<PriceComplexVO> priceComplexVOList = landDataService.selectByDealPricePerSpace(searchDTO);
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", priceComplexVOList);
+
+		if (result != null) {
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity(HttpStatus.NO_CONTENT);
+	}
+
+	@GetMapping("/selectByRealDealPrice")
+	public ResponseEntity<Map<String, Object>> selectByRealDealPrice(SearchDTO searchDTO) {
+		landDataService.clearRecommendList();
+		List<PriceComplexVO> priceComplexVOList = landDataService.selectByRealDealPrice(searchDTO);
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", priceComplexVOList);
+
+		if (result != null) {
 			return ResponseEntity.ok().body(result);
 		}
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -96,6 +149,7 @@ public class RestLandSearchController {
 		}
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
+
 
 	@GetMapping("/getByCode")
 	public ResponseEntity getComplexInfoByCode(@RequestParam("complexCode") String complexCode) {
@@ -125,8 +179,8 @@ public class RestLandSearchController {
 	}
 
 	@PostMapping("/updateByAddress")
-	public ResponseEntity<Boolean> updateByAddress(AddressDTO addressDTO) {
-		List<String> complexCodeList = landDataService.selectAllComplexCodeByAddress(addressDTO);
+	public ResponseEntity<Boolean> updateByAddress(SearchDTO searchDTO) {
+		List<String> complexCodeList = landDataService.selectAllComplexCodeByAddress(searchDTO);
 		System.out.println("=============== 업데이트 시작 : " + LocalDateTime.now() + "===============");
 		for (int i = 0; i < complexCodeList.size(); i++) {
 			System.out.println("=============== " + (complexCodeList.size() + 1) + " 중 " + (i + 1) + " 번째 단지 업데이트 시작 ===============");
@@ -137,21 +191,21 @@ public class RestLandSearchController {
 	}
 
 	@GetMapping("/recommend")
-	public ResponseEntity<Map<String, Object>> recommendComplexList(AddressDTO addressDTO) {
+	public ResponseEntity<Map<String, Object>> recommendComplexList(SearchDTO searchDTO) {
 		List<RecommendVO> recommendList = landDataService.getRecommendList();
 		Map<String, Object> result = new HashMap<>();
 		result.put("recommendList", recommendList);
 		if (recommendList != null) {
-			telegramService.funcTelegram(addressDTO, recommendList);
+			telegramService.funcTelegram(searchDTO, recommendList);
 			return ResponseEntity.ok().body(result);
 		}
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
 
 	@PostMapping("/getAddress")
-	public ResponseEntity getAddress(AddressDTO addressDTO) {
+	public ResponseEntity getAddress(SearchDTO searchDTO) {
 		// 주소 단계별 조회 후 리스트 리턴
-		Map<String, Object> addressMap = landDataService.getAddress(addressDTO);
+		Map<String, Object> addressMap = landDataService.getAddress(searchDTO);
 		if (addressMap.size() > 0) {
 			return ResponseEntity.ok().body(addressMap);
 		}
