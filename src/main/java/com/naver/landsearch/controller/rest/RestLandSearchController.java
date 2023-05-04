@@ -125,6 +125,34 @@ public class RestLandSearchController {
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
 
+	@GetMapping("/selectDealGapPrice")
+	public ResponseEntity<Map<String, Object>> selectDealGapPrice(SearchDTO searchDTO) {
+		// 지역별 호가 갭을 기준으로 정렬하여 조회
+		landDataService.clearRecommendList();
+		List<PriceComplexVO> priceComplexVOList = landDataService.selectDealGapPrice(searchDTO);
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", priceComplexVOList);
+
+		if (result != null) {
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@GetMapping("/selectRealDealGapPrice")
+	public ResponseEntity<Map<String, Object>> selectRealDealGapPrice(SearchDTO searchDTO) {
+		// 지역별 실거래 갑을 기준으로 정렬하여 조회
+		landDataService.clearRecommendList();
+		List<PriceComplexVO> priceComplexVOList = landDataService.selectRealDealGapPrice(searchDTO);
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", priceComplexVOList);
+
+		if (result != null) {
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
 	@GetMapping("/selectByRealDealPrice")
 	public ResponseEntity<Map<String, Object>> selectByRealDealPrice(SearchDTO searchDTO) {
 		landDataService.clearRecommendList();

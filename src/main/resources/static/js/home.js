@@ -90,26 +90,30 @@ function renderByPrice(param, url) {
             if ($("#onlyStairs").prop('checked') && item.entranceType == "복도식") {
                 return;
             }
+            if ($("#approveYear").val() != '' && (item.useApproveYear).indexOf($("#approveYear").val()) != 0) {
+                return;
+            }
             template += "<div>"
             if (item.gapPrice <= 5000) {
                 template += "<span style='font-weight: bold; color: red'>[" + (index+1) +  "." + item.address + "]" + item.complexName + "(" + item.useApproveYear + ")</span>";
             } else {
                 template += "<span style='font-weight: bold'>[" + (index + 1) + "." + item.address + "]" + item.complexName + "(" + item.useApproveYear + ")</span>";
             }
+            template += "<span><b> " + item.pyeongName + "(" + item.pyeongName2 + ")[" + item.entranceType + "]</b></span>";
             template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
-            template += "<span>(생성 일시 : " + item.createAt + ")</span>"
-            template += "<span> - " + item.pyeongName + "(" + item.pyeongName2 + ")[" + item.entranceType + "]</span>";
-            template += "<span>  : " + item.dealPriceMin + "(" + item.dealPricePerSpaceMin + ") (실 : " + item.realDealPrice + ") / " +
-                item.leasePriceMin + "(" + item.leasePricePerSpaceMin + ") (실 : " + item.realLeasePrice + ")]</span>";
+            template += "<span> : [[매호 - " + item.dealPriceMin + "(" + item.dealPricePerSpaceMinToInt + ") (매실 : " + item.realDealPrice + "(" + item.realDealPricePerSpaceToInt + "))]] // [[전호 - " +
+                item.leasePriceMin + "(" + item.leasePricePerSpaceMin + ") (전실 : " + item.realLeasePrice + ")]]</span>";
             if (item.gapPrice <= 5000) {
-                template += "<span style='font-weight: bold; color: red'> 갭 가격 : " + item.gapPrice + "</span>";
+                template += "<span style='font-weight: bold; color: red'> 갭 : " + item.gapPrice  + "(실갭:" + item.realGapPrice + ")</span>";
             } else {
-                template += "<span> 갭 가격 : " + item.gapPrice + "</span>";
+                template += "<span> 갭 가격 : " + item.gapPrice + "(실갭:" + item.realGapPrice + ")</span>";
             }
         });
         $("#dataContent").append(template);
     });
 }
+
+
 
 function dataSync() {
     var url = origin + "codeSync";
@@ -162,7 +166,8 @@ function dataUpdateAllByAddress() {
             data: param
         }).done((data) => {
             console.log(data);
-            $("#dataContent").empty();
+            $("#dataCont" +
+                "ent").empty();
         })
     } else {
         return false;
@@ -175,7 +180,7 @@ function dataRecommend() {
         address1 : $("#address1").val(),
         address2 : $("#address2").val(),
         address3 : $("#address3").val(),
-        address4 : $("#address4").val()
+
     };
     $.ajax({
         url: url,
@@ -318,39 +323,24 @@ function dataSelectByCode(code) {
     })
 }
 
-function dataSearchPrice() {
-    var url = origin + "getByPrice";
-    var param = {
-        dealPrice : $("#dealPrice").val()
+// 갭검색
+function selectDealGapPrice() { // 호가갭 검색
+    var param = { // 주소 검색 param
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val()
     };
-    $.ajax({
-        url: url,
-        data: param,
-        type: "GET",
-    }).done((data) => {
-        var template = "";
-        $("#dataContent").empty();
-
-        data.complexs.forEach(function(item, index) {
-            template += "<div>"
-            if (item.gapPrice <= 5000) {
-                template += "<span style='font-weight: bold; color: red'>[" + (index+1) +  "." + item.address + "]" + item.complexName + "(" + item.useApproveYear + ")</span>";
-            } else {
-                template += "<span style='font-weight: bold'>[" + (index + 1) + "." + item.address + "]" + item.complexName + "(" + item.useApproveYear + ")</span>";
-            }
-            template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
-            template += "<span>(생성 일시 : " + item.createAt + ")</span>"
-            template += "<span> - " + item.pyeongName + "(" + item.pyeongName2 + ")[" + item.entranceType + "]</span>";
-            template += "<span>  : " + item.dealPriceMin + " (실 : " + item.realDealPrice + ") / " +
-                item.leasePriceMin + "(실 : " + item.realLeasePrice + ")]</span>";
-            if (item.gapPrice <= 5000) {
-                template += "<span style='font-weight: bold; color: red'> 갭 가격 : " + item.gapPrice + "</span>";
-            } else {
-                template += "<span> 갭 가격 : " + item.gapPrice + "</span>";
-            }
-        });
-        $("#dataContent").append(template);
-    });
+    renderByPrice(param, origin + "selectDealGapPrice")
+}
+function selectRealDealGapPrice() { // 실거래가갭 검색
+    var param = { // 주소 검색 param
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val()
+    };
+    renderByPrice(param, origin + "selectRealDealGapPrice")
 }
 
 $(function() {

@@ -75,6 +75,15 @@
             <option value="90">90평대</option>
             <option value="100">100평대</option>
         </select>
+        <span>연식</span>
+        <select name="approveYear" id="approveYear">
+            <option value="">선택</option>
+            <option value="1990">1990이전</option>
+            <th:block th:each="year : ${#numbers.sequence(1991, 2023)}">
+                <option th:value="${year}" th:text="${year}"></option>
+            </th:block>
+        </select>
+        &nbsp
         <input value="호가조회" type="button" onclick="dataSearchByDealPyeongRange()"/>
         <input value="실거래가조회" type="button" onclick="dataSearchByRealDealPyeongRange()"/>
         &nbsp
@@ -82,26 +91,8 @@
         <input value="매매실거래가순" type="button" onclick="dataSelectByRealDealPrice()"/>
         &nbsp
         &nbsp
-        <span>호가금액대</span>
-        <select name="dealPrice" id="dealPrice">
-            <option value="">선택</option>
-            <option value="1">1억대</option>
-            <option value="2">2억대</option>
-            <option value="3">3억대</option>
-            <option value="4">4억대</option>
-            <option value="5">5억대</option>
-            <option value="6">6억대</option>
-            <option value="7">7억대</option>
-            <option value="8">8억대</option>
-            <option value="9">9억대</option>
-            <option value="10">10억대</option>
-            <option value="11">11억대</option>
-            <option value="12">12억대</option>
-            <option value="13">13억대</option>
-            <option value="14">14억대</option>
-            <option value="15">15억대</option>
-        </select>
-        <input value="조회" type="button" onclick="dataSearchPrice()"/>
+        <input value="호가갭" type="button" onclick="selectDealGapPrice()"/>
+        <input value="실갭" type="button" onclick="selectRealDealGapPrice()"/>
     </div>
     <HR/>
     <div id="dataContent">

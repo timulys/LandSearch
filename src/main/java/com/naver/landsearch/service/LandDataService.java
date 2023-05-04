@@ -201,17 +201,17 @@ public class LandDataService {
 		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddressAndPyeong(searchDTO);
 		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
 		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
-			.sorted(Comparator.comparing(PriceComplexVO::getDealPriceMinToInt).reversed())
+			.sorted(Comparator.comparing(PriceComplexVO::getDealPricePerSpaceMinToInt).reversed())
 			.collect(Collectors.toList());
 		return complexDetailList;
 	}
 
-	// 평형대별 실거래가 금액 순 목록 조회
+	// 평형대별 실거래가 평당가 순 목록 조회
 	public List<PriceComplexVO> selectByRealDealPricePyeongRange(SearchDTO searchDTO) {
 		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findRealDealPricePerSpaceByAddressAndPyeong(searchDTO);
 		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
 		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
-			.sorted(Comparator.comparing(PriceComplexVO::getRealDealPriceToInt).reversed())
+			.sorted(Comparator.comparing(PriceComplexVO::getRealDealPricePerSpaceToInt).reversed())
 			.collect(Collectors.toList());
 		return complexDetailList;
 	}
@@ -226,12 +226,34 @@ public class LandDataService {
 		return complexDetailList;
 	}
 
-	// 지역 주소별 실거래 매매가 내림차순 목록 조회
+	// 지역 주소별 호가 갭 오름차순 목록 조회
+	public List<PriceComplexVO> selectDealGapPrice(SearchDTO searchDTO) {
+		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddress(searchDTO);
+		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
+		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
+			.filter(item -> item.getDealPriceMinToInt() != 0 && item.getLeasePriceMin() != null)
+			.sorted(Comparator.comparing(PriceComplexVO::getGapPrice))
+			.collect(Collectors.toList());
+		return complexDetailList;
+	}
+
+	// 지역 주소별 실거래 갭 오름차순 목록 조회
+	public List<PriceComplexVO> selectRealDealGapPrice(SearchDTO searchDTO) {
+		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddress(searchDTO);
+		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
+		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
+			.filter(item -> item.getRealDealPriceToInt() != 0 && item.getRealLeasePriceToInt() != 0)
+			.sorted(Comparator.comparing(PriceComplexVO::getRealGapPrice))
+			.collect(Collectors.toList());
+		return complexDetailList;
+	}
+
+	// 지역 주소별 실거래 평당가 내림차순 목록 조회
 	public List<PriceComplexVO> selectByRealDealPrice(SearchDTO searchDTO) {
 		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findRealDealPriceMinByAddress(searchDTO);
 		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
 		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
-			.sorted(Comparator.comparing(PriceComplexVO::getRealDealPriceToInt).reversed())
+			.sorted(Comparator.comparing(PriceComplexVO::getRealDealPricePerSpaceToInt).reversed())
 			.collect(Collectors.toList());
 		return complexDetailList;
 	}
@@ -484,7 +506,9 @@ public class LandDataService {
 
 	private void setPriceFormatted(PriceComplexVO i) {
 		String dealPriceMin = "0";
+		Integer dealPricePerSpaceMin = 0;
 		String leasePriceMin = "0";
+		Integer leasePricePerSpaceMin = 0;
 		if (i.getDealPriceMin() != null) {
 			if (i.getDealPriceMin().contains(" ")) {
 				if (i.getDealPriceMin().split("억").length > 1 && i.getDealPriceMin().replaceAll("억 ", "").length() < 5) {
@@ -506,34 +530,25 @@ public class LandDataService {
 		}
 
 		if (i.getDealPricePerSpaceMin() != null) {
-			if (i.getDealPricePerSpaceMin().contains("억"))
-				i.setDealPricePerSpaceMinToInt(0);
-			else
-				i.setDealPricePerSpaceMinToInt(Integer.parseInt(i.getDealPricePerSpaceMin().replace(",", "")));
-		}
-
-		// 실거래가
-		if(i.getRealDealPrice() != null) {
-			if (i.getRealDealPrice().equals("없음")) {
-				i.setRealDealPriceToInt(0);
-			} else {
-				if (i.getRealDealPrice().contains(" ")) {
-					if (i.getRealDealPrice().split("억").length > 1 && i.getRealDealPrice().replaceAll("억 ", "").length() < 5) {
-						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll("억 ", "0").replace(",", "")));
-					} else {
-						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll("억 ", "").replace(",", "")));
-					}
+			if (i.getDealPricePerSpaceMin().contains("억 ") && i.getDealPricePerSpaceMin().contains(",")) {
+				dealPricePerSpaceMin = Integer.valueOf(i.getDealPricePerSpaceMin().replaceAll("억 ", "").replace(",", ""));
+			} else if (i.getDealPricePerSpaceMin().contains("억 ") && !i.getDealPricePerSpaceMin().contains(",")) {
+				if (i.getDealPricePerSpaceMin().replaceAll("억 ", "").length() == 3) {
+					dealPricePerSpaceMin = Integer.valueOf(i.getDealPricePerSpaceMin().replaceAll("억 ", "00"));
+				} else if (i.getDealPricePerSpaceMin().replaceAll("억 ", "").length() == 2) {
+					dealPricePerSpaceMin = Integer.valueOf(i.getDealPricePerSpaceMin().replaceAll("억 ", "000"));
 				} else {
-					if (i.getRealDealPrice().contains(",") && i.getRealDealPrice().contains("억"))
-						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replace(",", "").replace("억", "0000")));
-					else if (i.getRealDealPrice().contains(","))
-						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll(",", "")));
-					else
-						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll("억", "0000")));
+					dealPricePerSpaceMin = Integer.valueOf(i.getDealPricePerSpaceMin().replaceAll("억 ", "0"));
 				}
+			} else if (i.getDealPricePerSpaceMin().contains("억")) {
+				dealPricePerSpaceMin = Integer.valueOf(i.getDealPricePerSpaceMin().replaceAll("억", "0000"));
+			} else {
+				dealPricePerSpaceMin = Integer.valueOf(i.getDealPricePerSpaceMin().replace(",", ""));
 			}
+			i.setDealPricePerSpaceMinToInt(dealPricePerSpaceMin);
 		}
 
+		// 전세
 		if (i.getLeasePriceMin() != null) {
 			if (i.getLeasePriceMin().contains(" ")) {
 				if (i.getLeasePriceMin().split("억").length > 1 && i.getLeasePriceMin().replaceAll("억 ", "").length() < 5) {
@@ -553,5 +568,51 @@ public class LandDataService {
 			i.setLeasePriceMin("0");
 		}
 		i.setGapPrice(Integer.parseInt(dealPriceMin) - Integer.parseInt(leasePriceMin));
+
+		// 매매 실거래가
+		if(i.getRealDealPrice() != null) {
+			if (i.getRealDealPrice().equals("없음")) {
+				i.setRealDealPriceToInt(0);
+			} else {
+				if (i.getRealDealPrice().contains(" ")) {
+					if (i.getRealDealPrice().split("억").length > 1 && i.getRealDealPrice().replaceAll("억 ", "").length() < 5) {
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll("억 ", "0").replace(",", "")));
+					} else {
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll("억 ", "").replace(",", "")));
+					}
+				} else {
+					if (i.getRealDealPrice().contains(",") && i.getRealDealPrice().contains("억"))
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replace(",", "").replace("억", "0000")));
+					else if (i.getRealDealPrice().contains(","))
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll(",", "")));
+					else
+						i.setRealDealPriceToInt(Integer.parseInt(i.getRealDealPrice().replaceAll("억", "0000")));
+				}
+			}
+			// 실거래가 평당가 세팅
+			i.setRealDealPricePerSpace();
+		}
+		// 전세 실거래가
+		if (i.getRealLeasePrice() != null) {
+			if (i.getRealLeasePrice().equals("없음")) {
+				i.setRealLeasePriceToInt(0);
+			} else {
+				if (i.getRealLeasePrice().contains(" ")) {
+					if (i.getRealLeasePrice().split("억").length > 1 && i.getRealLeasePrice().replaceAll("억 ", "").length() < 5) {
+						i.setRealLeasePriceToInt(Integer.parseInt(i.getRealLeasePrice().replaceAll("억 ", "0").replace(",", "")));
+					} else {
+						i.setRealLeasePriceToInt(Integer.parseInt(i.getRealLeasePrice().replaceAll("억 ", "").replace(",", "")));
+					}
+				} else {
+					if (i.getRealLeasePrice().contains(",") && i.getRealLeasePrice().contains("억"))
+						i.setRealLeasePriceToInt(Integer.parseInt(i.getRealLeasePrice().replace(",", "").replace("억", "0000")));
+					else if (i.getRealLeasePrice().contains(","))
+						i.setRealLeasePriceToInt(Integer.parseInt(i.getRealLeasePrice().replaceAll(",", "")));
+					else
+						i.setRealLeasePriceToInt(Integer.parseInt(i.getRealLeasePrice().replaceAll("억", "0000")));
+				}
+			}
+		}
+		i.setRealGapPrice(i.getRealDealPriceToInt() - i.getRealLeasePriceToInt());
 	}
 }

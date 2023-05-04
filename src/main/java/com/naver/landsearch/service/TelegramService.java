@@ -22,7 +22,6 @@ import java.util.List;
  * ======================================================
  * 2023-03-06			jhchoi				최초 생성
  */
-// TODO : 추후 텔레그램 메신저로 보낼 수 있는 방법을 고려해볼 것
 @Service
 @RequiredArgsConstructor
 public class TelegramService {

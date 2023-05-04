@@ -39,7 +39,7 @@ public class PriceComplexDetailRepository {
 	public List<PriceComplexVO> findByDealPrice(String dealPrice) {
 		List<PriceComplexVO> priceComplexList = queryFactory
 			.select(Projections.constructor(PriceComplexVO.class, c.address, c.complexName, c.landDataUrl,
-				c.useApproveYmd, p.pyeongName, p.pyeongName2, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
+				c.useApproveYmd, p.pyeongName, p.pyeongName2, p.supplyArea, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
 				a.leasePriceMin, a.leasePricePerSpaceMin, l.formattedPrice, a.createdAt, p.entranceType))
 			.from(c)
 			.join(c.complexPyeongDetailList, p)
@@ -57,7 +57,7 @@ public class PriceComplexDetailRepository {
 	public List<PriceComplexVO> findDealPricePerSpaceByAddress(SearchDTO searchDTO) {
 		List<PriceComplexVO> priceComplexList = queryFactory
 			.select(Projections.constructor(PriceComplexVO.class, c.address, c.complexName, c.landDataUrl, c.useApproveYmd,
-				p.pyeongName, p.pyeongName2, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
+				p.pyeongName, p.pyeongName2, p.supplyArea, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
 				a.leasePriceMin, a.leasePricePerSpaceMin, l.formattedPrice, a.createdAt, p.entranceType))
 			.from(c)
 			.join(c.complexPyeongDetailList, p)
@@ -74,7 +74,7 @@ public class PriceComplexDetailRepository {
 	public List<PriceComplexVO> findDealPricePerSpaceByAddressAndPyeong(SearchDTO searchDTO) {
 		List<PriceComplexVO> priceComplexList = queryFactory
 			.select(Projections.constructor(PriceComplexVO.class, c.address, c.complexName, c.landDataUrl, c.useApproveYmd,
-				p.pyeongName, p.pyeongName2, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
+				p.pyeongName, p.pyeongName2, p.supplyArea, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
 				a.leasePriceMin, a.leasePricePerSpaceMin, l.formattedPrice, a.createdAt, p.entranceType))
 			.from(c)
 			.join(c.complexPyeongDetailList, p)
@@ -85,7 +85,6 @@ public class PriceComplexDetailRepository {
 			.where(p.exclusivePyeong.castToNum(Integer.class)
 				.between(Integer.parseInt(searchDTO.getExPyeong()), Integer.parseInt(searchDTO.getExPyeong()) + 9))
 			.where(a.dealPricePerSpaceMin.isNotNull())
-			.orderBy(a.dealPriceMin.desc())
 			.fetch();
 
 		return priceComplexList;
@@ -94,7 +93,7 @@ public class PriceComplexDetailRepository {
 	public List<PriceComplexVO> findRealDealPricePerSpaceByAddressAndPyeong(SearchDTO searchDTO) {
 		List<PriceComplexVO> priceComplexList = queryFactory
 			.select(Projections.constructor(PriceComplexVO.class, c.address, c.complexName, c.landDataUrl, c.useApproveYmd,
-				p.pyeongName, p.pyeongName2, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
+				p.pyeongName, p.pyeongName2, p.supplyArea, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
 				a.leasePriceMin, a.leasePricePerSpaceMin, l.formattedPrice, a.createdAt, p.entranceType))
 			.from(c)
 			.join(c.complexPyeongDetailList, p)
@@ -114,7 +113,7 @@ public class PriceComplexDetailRepository {
 	public List<PriceComplexVO> findRealDealPriceMinByAddress(SearchDTO searchDTO) {
 		List<PriceComplexVO> priceComplexList = queryFactory
 			.select(Projections.constructor(PriceComplexVO.class, c.address, c.complexName, c.landDataUrl, c.useApproveYmd,
-				p.pyeongName, p.pyeongName2, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
+				p.pyeongName, p.pyeongName2, p.supplyArea, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
 				a.leasePriceMin, a.leasePricePerSpaceMin, l.formattedPrice, a.createdAt, p.entranceType))
 			.from(c)
 			.join(c.complexPyeongDetailList, p)
