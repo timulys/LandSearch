@@ -228,10 +228,16 @@ public class LandDataService {
 
 	// 지역 주소별 호가 갭 오름차순 목록 조회
 	public List<PriceComplexVO> selectDealGapPrice(SearchDTO searchDTO) {
-		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddress(searchDTO);
+		List<PriceComplexVO> priceComplexVOList = new ArrayList<>();
+		if (searchDTO.getExPyeong() == "")
+			priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddress(searchDTO);
+		else
+			priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddressAndPyeong(searchDTO);
+
 		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
 		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
 			.filter(item -> item.getDealPriceMinToInt() != 0 && item.getLeasePriceMin() != null)
+			.filter(item -> item.getGapPrice() <= searchDTO.getSearchGap())
 			.sorted(Comparator.comparing(PriceComplexVO::getGapPrice))
 			.collect(Collectors.toList());
 		return complexDetailList;
@@ -239,10 +245,16 @@ public class LandDataService {
 
 	// 지역 주소별 실거래 갭 오름차순 목록 조회
 	public List<PriceComplexVO> selectRealDealGapPrice(SearchDTO searchDTO) {
-		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddress(searchDTO);
+		List<PriceComplexVO> priceComplexVOList = new ArrayList<>();
+		if (searchDTO.getExPyeong() == "")
+			priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddress(searchDTO);
+		else
+			priceComplexVOList = priceComplexDetailRepository.findDealPricePerSpaceByAddressAndPyeong(searchDTO);
+
 		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
 		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
 			.filter(item -> item.getRealDealPriceToInt() != 0 && item.getRealLeasePriceToInt() != 0)
+			.filter(item -> item.getRealGapPrice() <= searchDTO.getSearchGap())
 			.sorted(Comparator.comparing(PriceComplexVO::getRealGapPrice))
 			.collect(Collectors.toList());
 		return complexDetailList;
@@ -254,6 +266,16 @@ public class LandDataService {
 		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
 		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
 			.sorted(Comparator.comparing(PriceComplexVO::getRealDealPricePerSpaceToInt).reversed())
+			.collect(Collectors.toList());
+		return complexDetailList;
+	}
+
+	// 가격 타입별 금액대 조회
+	public List<PriceComplexVO> selectPriceRange(SearchDTO searchDTO) {
+		List<PriceComplexVO> priceComplexVOList = priceComplexDetailRepository.findAllByPriceRange(searchDTO);
+		Map<String, PriceComplexVO> distinctMap = getPriceComplexList(priceComplexVOList);
+		List<PriceComplexVO> complexDetailList = new ArrayList<>(distinctMap.values()).stream()
+			.sorted(Comparator.comparing(PriceComplexVO::getDealPriceMin).reversed())
 			.collect(Collectors.toList());
 		return complexDetailList;
 	}

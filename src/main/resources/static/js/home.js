@@ -58,6 +58,42 @@ function dataSearchByRealDealPyeongRange() {
     renderByPrice(param, origin + "selectByRealDealPricePyeongRange")
 }
 
+function showShortsForm() {
+    var param = {
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val(),
+        exPyeong : $("#pyeongRange").val()
+    };
+    $.ajax({
+        url: origin + "selectByRealDealPricePyeongRange",
+        data: param,
+        type: "GET",
+    }).done((data) => {
+        var template = "";
+        $("#dataContent").empty();
+        template += getToday() + "</br>";
+        template += $("#address1").val() + " " + $("#address2").val();
+        if ($("#address3").val())
+            template += " " + $("#address3").val();
+        if ($("#address4").val())
+            template += " " + $("#address4").val();
+        template +="  전용 " + $("#pyeongRange").val() + "평대</br>";
+        template += "300세대 이상 아파트</br>실거래 평당가 TOP 10 입니다.</br>";
+        template += "(가장 최근 반영된 실거래가 기준입니다.)</br></br>";
+        data.complexs.forEach(function(item, index) {
+            if (index < 10) {
+                template += "<div>";
+                template += "<span>" + (index + 1) + "위 " + item.complexName + ", " + item.pyeongName + "타입, 평당가 " + item.realDealPricePerSpaceToInt + "만원</span>"
+                template += "</div>";
+            }
+        });
+
+        $("#dataContent").append(template);
+    });
+}
+
 function dataSelectByDealPricePerSpace() {
     var param = {
         address1 : $("#address1").val(),
@@ -76,6 +112,18 @@ function dataSelectByRealDealPrice() {
         address4 : $("#address4").val()
     };
     renderByPrice(param, origin + "selectByRealDealPrice");
+}
+
+function dataSelectByPriceRange() {
+    var param = {
+        address1 : $("#address1").val(),
+        address2 : $("#address2").val(),
+        address3 : $("#address3").val(),
+        address4 : $("#address4").val(),
+        searchPriceType : $("#priceType").val(),
+        searchPriceRange : $("#priceRange").val()
+    };
+    renderByPrice(param, origin + "selectByPriceRange");
 }
 
 function renderByPrice(param, url) {
@@ -329,7 +377,9 @@ function selectDealGapPrice() { // 호가갭 검색
         address1 : $("#address1").val(),
         address2 : $("#address2").val(),
         address3 : $("#address3").val(),
-        address4 : $("#address4").val()
+        address4 : $("#address4").val(),
+        exPyeong : $("#pyeongRange").val(),
+        searchGap : $("#searchGap").val()
     };
     renderByPrice(param, origin + "selectDealGapPrice")
 }
@@ -338,9 +388,21 @@ function selectRealDealGapPrice() { // 실거래가갭 검색
         address1 : $("#address1").val(),
         address2 : $("#address2").val(),
         address3 : $("#address3").val(),
-        address4 : $("#address4").val()
+        address4 : $("#address4").val(),
+        exPyeong : $("#pyeongRange").val(),
+        searchGap : $("#searchGap").val()
     };
     renderByPrice(param, origin + "selectRealDealGapPrice")
+}
+
+function getToday() {
+    var today = new Date();
+
+    var year = today.getFullYear();
+    var month = ('0' + (today.getMonth() + 1)).slice(-2);
+    var day = ('0' + today.getDate()).slice(-2);
+
+    return year + '년 ' + month  + '월 ' + day + '일';
 }
 
 $(function() {

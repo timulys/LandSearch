@@ -1,6 +1,5 @@
 package com.naver.landsearch.domain.price;
 
-import com.naver.landsearch.domain.BaseDomain;
 import lombok.*;
 
 import javax.persistence.*;

@@ -99,6 +99,8 @@ public class PriceComplexVO implements Comparable<PriceComplexVO> {
 	private Integer gapPrice;
 	// 갭 가격(실거래가)
 	private Integer realGapPrice;
+	// 최근 실거래 차액
+	private Integer dealMargin;
 
 	@Override
 	public int compareTo(PriceComplexVO o) {

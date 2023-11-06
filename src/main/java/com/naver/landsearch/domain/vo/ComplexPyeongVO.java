@@ -2,6 +2,8 @@ package com.naver.landsearch.domain.vo;
 
 import lombok.*;
 
+import java.util.stream.IntStream;
+
 /**
  * PackageName 	: com.naver.landsearch.domain.vo
  * FileName 	: ComplexPyeongVO
@@ -36,6 +38,7 @@ public class ComplexPyeongVO {
 	// 갭가격
 	private Integer gapPrice;
 	// 최고 공시가격
+
 	private String landPriceMaxByPtp;
 	// 현관 타입
 	private String entranceType;

@@ -153,6 +153,20 @@ public class RestLandSearchController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	@GetMapping("/selectByPriceRange")
+	public ResponseEntity<Map<String, Object>> selectByPriceRange(SearchDTO searchDTO) {
+		// 가격 타입별 금액대로 조회 (호가/실거래가)
+		landDataService.clearRecommendList();
+		List<PriceComplexVO> priceComplexVOList = landDataService.selectPriceRange(searchDTO);
+		Map<String, Object> result = new HashMap<>();
+		result.put("complexs", priceComplexVOList);
+
+		if (result != null) {
+			return ResponseEntity.ok().body(result);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
 	@GetMapping("/selectByRealDealPrice")
 	public ResponseEntity<Map<String, Object>> selectByRealDealPrice(SearchDTO searchDTO) {
 		landDataService.clearRecommendList();

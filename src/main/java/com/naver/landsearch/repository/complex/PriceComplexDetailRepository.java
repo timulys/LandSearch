@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -124,6 +125,45 @@ public class PriceComplexDetailRepository {
 			.where(d.formattedPrice.isNotNull())
 			.orderBy(d.formattedPrice.length().desc(), d.formattedPrice.desc())
 			.fetch();
+
+		return priceComplexList;
+	}
+
+	public List<PriceComplexVO> findAllByPriceRange(SearchDTO searchDTO) {
+		List<PriceComplexVO> priceComplexList = new ArrayList<>();
+		if (searchDTO.getSearchPriceType() == 0) {
+			// 호가 타입 조회
+			priceComplexList = queryFactory
+				.select(Projections.constructor(PriceComplexVO.class, c.address, c.complexName, c.landDataUrl, c.useApproveYmd,
+					p.pyeongName, p.pyeongName2, p.supplyArea, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
+					a.leasePriceMin, a.leasePricePerSpaceMin, l.formattedPrice, a.createdAt, p.entranceType))
+				.from(c)
+				.join(c.complexPyeongDetailList, p)
+				.join(p.articleStatistics, a)
+				.join(p.realDealPrice, d)
+				.leftJoin(p.realLeasePrice, l)
+				.where(this.builderAddress(searchDTO))
+				.where(d.formattedPrice.isNotNull())
+				.where(a.dealPriceMin.like(searchDTO.getSearchPriceRange() + "억%"))
+				.orderBy(d.formattedPrice.length().desc(), d.formattedPrice.desc())
+				.fetch();
+		} else {
+			// 실거래가 타입 조회
+			priceComplexList = queryFactory
+				.select(Projections.constructor(PriceComplexVO.class, c.address, c.complexName, c.landDataUrl, c.useApproveYmd,
+					p.pyeongName, p.pyeongName2, p.supplyArea, a.dealPriceMin, a.dealPricePerSpaceMin, d.formattedPrice,
+					a.leasePriceMin, a.leasePricePerSpaceMin, l.formattedPrice, a.createdAt, p.entranceType))
+				.from(c)
+				.join(c.complexPyeongDetailList, p)
+				.join(p.articleStatistics, a)
+				.join(p.realDealPrice, d)
+				.leftJoin(p.realLeasePrice, l)
+				.where(this.builderAddress(searchDTO))
+				.where(d.formattedPrice.isNotNull())
+				.where(d.formattedPrice.like(searchDTO.getSearchPriceRange() + "억%"))
+				.orderBy(d.formattedPrice.length().desc(), d.formattedPrice.desc())
+				.fetch();
+		}
 
 		return priceComplexList;
 	}

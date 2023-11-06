@@ -27,4 +27,12 @@ public class SearchDTO {
 
 	// 평형대 검색 옵션
 	private String exPyeong;
+
+	// 갭 검색 옵션
+	private Integer searchGap;
+
+	// 금액대 검색 타입
+	private Integer searchPriceType; // 0 : 호가, 1 : 실거래가
+	// 금액대 검색 범위
+	private Integer searchPriceRange; // x 억
 }

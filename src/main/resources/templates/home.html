@@ -24,6 +24,39 @@
         <input value="단건등록하기" type="button" onclick="dataSend()"/>
         <input value="전체업데이트" type="button" onclick="dataUpdateAll()"/>
         <input value="코드동기화" type="button" onclick="dataSync()"/>
+        &nbsp
+        <span>금액대 : </span>
+        <select name="priceType" id="priceType">
+            <option value="">선택</option>
+            <option value="0">호가</option>
+            <option value="1">실거래가</option>
+        </select>
+        <select name="priceRange" id="priceRange">
+            <option value="">선택</option>
+            <option value="1">1억대</option>
+            <option value="2">2억대</option>
+            <option value="3">3억대</option>
+            <option value="4">4억대</option>
+            <option value="5">5억대</option>
+            <option value="6">6억대</option>
+            <option value="7">7억대</option>
+            <option value="8">8억대</option>
+            <option value="9">9억대</option>
+            <option value="10">10억대</option>
+            <option value="11">11억대</option>
+            <option value="12">12억대</option>
+            <option value="13">13억대</option>
+            <option value="14">14억대</option>
+            <option value="15">15억대</option>
+            <option value="16">16억대</option>
+            <option value="17">17억대</option>
+            <option value="18">18억대</option>
+            <option value="19">19억대</option>
+            <option value="20">20억대</option>
+            <option value="21">21억대</option>
+            <option value="22">22억대</option>
+        </select>
+        <input value="금액대조회" type="button" onclick="dataSelectByPriceRange()"/>
     </div>
     <div>
         <select name="address1" id="address1">
@@ -60,6 +93,10 @@
         <input value="추천매물" type="button" onclick="dataRecommend()"/>
         <input value="업데이트" type="button" onclick="dataUpdateAllByAddress()"/>
         &nbsp
+        &nbsp
+        <input value="매매평당가순" type="button" onclick="dataSelectByDealPricePerSpace()"/>
+        <input value="매매실거래가순" type="button" onclick="dataSelectByRealDealPrice()"/>
+        &nbsp
         <span>전용</span>
         <select name="pyeongRange" id="pyeongRange">
             <option value="">선택</option>
@@ -86,11 +123,9 @@
         &nbsp
         <input value="호가조회" type="button" onclick="dataSearchByDealPyeongRange()"/>
         <input value="실거래가조회" type="button" onclick="dataSearchByRealDealPyeongRange()"/>
+        <input value="쇼츠폼" type="button" onclick="showShortsForm()"/>
         &nbsp
-        <input value="매매평당가순" type="button" onclick="dataSelectByDealPricePerSpace()"/>
-        <input value="매매실거래가순" type="button" onclick="dataSelectByRealDealPrice()"/>
-        &nbsp
-        &nbsp
+        <input id="searchGap" type="text" value="9999999" style="width:70px;" placeholder="갭가격"/>
         <input value="호가갭" type="button" onclick="selectDealGapPrice()"/>
         <input value="실갭" type="button" onclick="selectRealDealGapPrice()"/>
     </div>
