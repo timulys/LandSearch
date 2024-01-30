@@ -1,4 +1,4 @@
-var origin = "http://localhost:9090/api/";
+var origin = "http://localhost:9001/api/";
 // var origin = "http://192.168.55.81:9090/api/";
 
 function dataSend() {
@@ -214,8 +214,7 @@ function dataUpdateAllByAddress() {
             data: param
         }).done((data) => {
             console.log(data);
-            $("#dataCont" +
-                "ent").empty();
+            $("#dataContent").empty();
         })
     } else {
         return false;
