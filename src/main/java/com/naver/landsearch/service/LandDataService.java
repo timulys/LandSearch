@@ -52,7 +52,7 @@ public class LandDataService {
 	public static final String LAND_API = "https://new.land.naver.com/api/complexes/";
 
 	// File Load
-	private final static String FILE_PATH = "D:/landdata_complex_detail.csv";
+	private final static String FILE_PATH = "C:/Users/user/Desktop/jhchoi/landdata_complex_detail.txt";
 	private final ResourceLoader resourceLoader;
 
 	// 수도권 추천 매물 List

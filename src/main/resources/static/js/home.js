@@ -284,7 +284,7 @@ function renderTemplate(data) {
         template += "<a href='" + item.landDataUrl + "' target='_blank'>[V]</a>";
         template += "<input type='button' onclick='dataSelectByCode(" + item.complexNo + ")' value='H'/>";
         template += "<input type='button' onclick='dataSendByCode(" + item.complexNo + ")' value='U'/>";
-        template += "<span style='font-size: 6px'>(" + item.updateAt + ")</span>"
+        template += "<span style='font-size: 8px'>(" + item.updateAt + ")</span>"
         item.complexPyeongVOList.forEach(function(pyeong) {
             var entrance = "";
             pyeong.entranceType == "계단식" ? entrance = "계" : entrance = "복";
@@ -299,11 +299,11 @@ function renderTemplate(data) {
                 } else {
                     template += "<span style='font-weight: bold; color: red;'>:: " + pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
                 }
-                template += "<span style='font-weight: bold; color: red; font-size: 6px'>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
+                template += "<span style='font-weight: bold; color: red; font-size: 8px'>[" +  pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
                     pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ") : " + pyeong.gapPrice + "만 (" + pyeong.leasePriceRateMin + ")]</span>";
             } else {
-                template += "<span style='font-size: 6px'>:: " + pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
-                template += "<span style='font-size: 6px'>[" + pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
+                template += "<span style='font-size: 8px'>:: " + pyeong.pyeongName + "(" + pyeong.pyeongName2 + "[" + entrance + "])</span>";
+                template += "<span style='font-size: 8px'>[" + pyeong.dealPriceMin + "(" + pyeong.dealPricePerSpaceMin + ")/" +
                     pyeong.leasePriceMin + "(" + pyeong.leasePricePerSpaceMin + ")]</span>";
             }
             if (pyeong.landPriceMaxByPtp * 1 > 0 && pyeong.landPriceMaxByPtp * 1 <= 100000000) {
